@@ -71,6 +71,7 @@
 	<taskdef classpathref="lib.classpath" resource="tasks.properties" />
 
 	<taskdef classname="com.tonicsystems.jarjar.JarJarTask" classpath="${project.dir}/lib/development/jarjar.jar" name="jarjar" />
+	<taskdef classname="com.oopsconsultancy.xmltask.ant.XmlTask" classpath="${project.dir}/lib/development/xmltask.jar" name="xmltask" />
 
 	<property name="doc.dir" value="${project.dir}/api" />
 
@@ -154,6 +155,8 @@
 			<var name="dir.location.windows" unset="true" />
 		</sequential>
 	</for>
+
+	<basename file="${basedir}" property="basedir.name" />
 
 	<antelope:stringutil string="${basedir}" property="basedir.unix">
 		<antelope:replace regex="\\" replacement="/" />
@@ -700,6 +703,22 @@ Please set the environment variable ANT_OPTS to the recommended value of
 		</ant>
 
 		<antcall target="report-test-coverage" />
+	</target>
+
+	<target name="test-method" depends="compile,instrument-test-coverage,compile-test">
+		<junit dir="${project.dir}" fork="on" forkmode="once" haltonfailure="${junit.halt.on.failure}" outputtoformatters="false" printsummary="on" showoutput="true">
+			<sysproperty key="net.sourceforge.cobertura.datafile" file="test-coverage/cobertura.ser" />
+			<jvmarg line="${junit.debug.jpda}" />
+			<jvmarg value="-Xmx1024m" />
+			<jvmarg value="-XX:MaxPermSize=256m" />
+			<jvmarg value="-Dexternal-properties=${test.properties}" />
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Djava.net.preferIPv4Stack=true" />
+			<jvmarg value="-Duser.timezone=GMT" />
+			<classpath location="test-coverage" />
+			<classpath refid="test.classpath" />
+			<test name="${class}" methods="${methods}"/>
+		</junit>
 	</target>
 
 	<target name="test-unit" depends="compile,instrument-test-coverage,compile-test-unit">

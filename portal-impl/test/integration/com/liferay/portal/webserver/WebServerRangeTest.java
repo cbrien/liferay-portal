@@ -145,6 +145,7 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 	protected HttpServlet getServlet() {
 		return new WebServerServlet() {
 
+			@Override
 			protected boolean isSupportsRangeHeader(String contentType) {
 				return true;
 			}
@@ -155,7 +156,7 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 	protected MockHttpServletResponse testRange(String rangeHeader)
 		throws Exception {
 
-		String fileName = "Range-Test.txt";
+		String fileName = "Test Range.txt";
 
 		FileEntry fileEntry = addFileEntry(
 			parentFolder.getFolderId(), fileName, fileName,
@@ -172,7 +173,7 @@ public class WebServerRangeTest extends BaseWebServerTestCase {
 		}
 
 		MockHttpServletResponse response = service(
-			Method.GET, path, headers, null);
+			Method.GET, path, headers, null, null, null);
 
 		int status = response.getStatus();
 

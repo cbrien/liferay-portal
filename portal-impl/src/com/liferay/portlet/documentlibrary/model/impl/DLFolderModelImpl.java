@@ -119,6 +119,10 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	 * @return the normal model instance
 	 */
 	public static DLFolder toModel(DLFolderSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
 		DLFolder model = new DLFolderImpl();
 
 		model.setUuid(soapModel.getUuid());
@@ -152,6 +156,10 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 	 * @return the normal model instances
 	 */
 	public static List<DLFolder> toModels(DLFolderSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
 		List<DLFolder> models = new ArrayList<DLFolder>(soapModels.length);
 
 		for (DLFolderSoap soapModel : soapModels) {
@@ -691,9 +699,17 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 		}
 	}
 
+	public boolean isDenied() {
+		if (getStatus() == WorkflowConstants.STATUS_DENIED) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isDraft() {
-		if ((getStatus() == WorkflowConstants.STATUS_DRAFT) ||
-				(getStatus() == WorkflowConstants.STATUS_DRAFT_FROM_APPROVED)) {
+		if (getStatus() == WorkflowConstants.STATUS_DRAFT) {
 			return true;
 		}
 		else {
@@ -703,6 +719,24 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 
 	public boolean isExpired() {
 		if (getStatus() == WorkflowConstants.STATUS_EXPIRED) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public boolean isInactive() {
+		if (getStatus() == WorkflowConstants.STATUS_INACTIVE) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public boolean isIncomplete() {
+		if (getStatus() == WorkflowConstants.STATUS_INCOMPLETE) {
 			return true;
 		}
 		else {
@@ -721,6 +755,15 @@ public class DLFolderModelImpl extends BaseModelImpl<DLFolder>
 
 	public boolean isPending() {
 		if (getStatus() == WorkflowConstants.STATUS_PENDING) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public boolean isScheduled() {
+		if (getStatus() == WorkflowConstants.STATUS_SCHEDULED) {
 			return true;
 		}
 		else {

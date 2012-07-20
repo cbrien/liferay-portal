@@ -114,6 +114,10 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	 * @return the normal model instance
 	 */
 	public static MBThread toModel(MBThreadSoap soapModel) {
+		if (soapModel == null) {
+			return null;
+		}
+
 		MBThread model = new MBThreadImpl();
 
 		model.setThreadId(soapModel.getThreadId());
@@ -143,6 +147,10 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 	 * @return the normal model instances
 	 */
 	public static List<MBThread> toModels(MBThreadSoap[] soapModels) {
+		if (soapModels == null) {
+			return null;
+		}
+
 		List<MBThread> models = new ArrayList<MBThread>(soapModels.length);
 
 		for (MBThreadSoap soapModel : soapModels) {
@@ -571,9 +579,17 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 		}
 	}
 
+	public boolean isDenied() {
+		if (getStatus() == WorkflowConstants.STATUS_DENIED) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
 	public boolean isDraft() {
-		if ((getStatus() == WorkflowConstants.STATUS_DRAFT) ||
-				(getStatus() == WorkflowConstants.STATUS_DRAFT_FROM_APPROVED)) {
+		if (getStatus() == WorkflowConstants.STATUS_DRAFT) {
 			return true;
 		}
 		else {
@@ -583,6 +599,24 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 	public boolean isExpired() {
 		if (getStatus() == WorkflowConstants.STATUS_EXPIRED) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public boolean isInactive() {
+		if (getStatus() == WorkflowConstants.STATUS_INACTIVE) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public boolean isIncomplete() {
+		if (getStatus() == WorkflowConstants.STATUS_INCOMPLETE) {
 			return true;
 		}
 		else {
@@ -601,6 +635,15 @@ public class MBThreadModelImpl extends BaseModelImpl<MBThread>
 
 	public boolean isPending() {
 		if (getStatus() == WorkflowConstants.STATUS_PENDING) {
+			return true;
+		}
+		else {
+			return false;
+		}
+	}
+
+	public boolean isScheduled() {
+		if (getStatus() == WorkflowConstants.STATUS_SCHEDULED) {
 			return true;
 		}
 		else {

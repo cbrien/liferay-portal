@@ -58,6 +58,7 @@ request.setAttribute("search.jsp-portletURL", portletURL);
 
 <aui:form action="<%= searchURL %>" method="get" name="fm" onSubmit='<%= "event.preventDefault();" %>'>
 	<liferay-portlet:renderURLParams varImpl="searchURL" />
+	<aui:input name="<%= SearchContainer.DEFAULT_CUR_PARAM %>" type="hidden" value="<%= ParamUtil.getInteger(request, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_CUR) %>" />
 	<aui:input name="format" type="hidden" value="<%= format %>" />
 
 	<aui:fieldset>
@@ -120,14 +121,6 @@ request.setAttribute("search.jsp-portletURL", portletURL);
 
 	<%@ include file="/html/portlet/search/main_search.jspf" %>
 
-	<%
-	String[] entryClassNames = searchContext.getEntryClassNames();
-
-	if (entryClassNames.length == 1) {
-		portletURL.setParameter("entryClassName", entryClassNames[0]);
-	}
-	%>
-
 	<c:if test="<%= displayOpenSearchResults %>">
 		<liferay-ui:panel collapsible="<%= true %>" cssClass="open-search-panel" extended="<%= true %>" id="searchOpenSearchPanelContainer" persistState="<%= true %>" title="open-search">
 			<%@ include file="/html/portlet/search/open_search.jspf" %>
@@ -154,6 +147,8 @@ request.setAttribute("search.jsp-portletURL", portletURL);
 		pageLinks.delegate(
 			'click',
 			function(event) {
+				document.<portlet:namespace />fm.<portlet:namespace /><%= SearchContainer.DEFAULT_CUR_PARAM %>.value = parseInt(document.<portlet:namespace />fm.<portlet:namespace /><%= SearchContainer.DEFAULT_CUR_PARAM %>.value) - 1;
+
 				submitForm(document.<portlet:namespace />fm);
 
 				event.preventDefault();
@@ -164,7 +159,7 @@ request.setAttribute("search.jsp-portletURL", portletURL);
 		pageLinks.delegate(
 			'click',
 			function(event) {
-				document.<portlet:namespace />fm.<portlet:namespace /><%= SearchContainer.DEFAULT_CUR_PARAM %>.value = parseInt(document.<portlet:namespace />fm.<portlet:namespace /><%= SearchContainer.DEFAULT_CUR_PARAM %>.value) + 2;
+				document.<portlet:namespace />fm.<portlet:namespace /><%= SearchContainer.DEFAULT_CUR_PARAM %>.value = parseInt(document.<portlet:namespace />fm.<portlet:namespace /><%= SearchContainer.DEFAULT_CUR_PARAM %>.value) + 1;
 
 				submitForm(document.<portlet:namespace />fm);
 

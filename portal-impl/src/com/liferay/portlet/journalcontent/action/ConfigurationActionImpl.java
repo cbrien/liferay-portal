@@ -146,14 +146,21 @@ public class ConfigurationActionImpl extends DefaultConfigurationAction {
 			themeDisplay.getCompanyId());
 
 		try {
-			journalArticle =
-				JournalArticleLocalServiceUtil.getDisplayArticle(
-					themeDisplay.getScopeGroupId(), articleId);
+			journalArticle = JournalArticleLocalServiceUtil.getDisplayArticle(
+				themeDisplay.getScopeGroupId(), articleId);
 		}
 		catch (NoSuchArticleException nsae) {
-			journalArticle =
-				JournalArticleLocalServiceUtil.getDisplayArticle(
-					companyGroup.getGroupId(), articleId);
+		}
+
+		if (journalArticle == null) {
+			try {
+				journalArticle =
+					JournalArticleLocalServiceUtil.getDisplayArticle(
+						companyGroup.getGroupId(), articleId);
+			}
+			catch (NoSuchArticleException nsae) {
+				return null;
+			}
 		}
 
 		String portletIds = getRuntimePortletIds(journalArticle.getContent());

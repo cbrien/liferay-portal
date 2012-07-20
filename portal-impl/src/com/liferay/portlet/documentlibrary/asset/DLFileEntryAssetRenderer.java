@@ -108,7 +108,12 @@ public class DLFileEntryAssetRenderer
 	}
 
 	public String getTitle(Locale locale) {
-		return _fileVersion.getTitle();
+		if (_type == AssetRendererFactory.TYPE_LATEST) {
+			return _fileVersion.getTitle();
+		}
+		else {
+			return _fileEntry.getTitle();
+		}
 	}
 
 	public String getType() {
@@ -229,6 +234,10 @@ public class DLFileEntryAssetRenderer
 			if ((_type == AssetRendererFactory.TYPE_LATEST) ||
 				Validator.isNotNull(version)) {
 
+				if ((_fileEntry != null) && Validator.isNotNull(version)) {
+					_fileVersion = _fileEntry.getFileVersion(version);
+				}
+
 				renderRequest.setAttribute(
 					WebKeys.DOCUMENT_LIBRARY_FILE_VERSION, _fileVersion);
 			}
@@ -238,6 +247,13 @@ public class DLFileEntryAssetRenderer
 		else {
 			return null;
 		}
+	}
+
+	@Override
+	public String renderActions(
+		RenderRequest renderRequest, RenderResponse renderResponse) {
+
+		return "/html/portlet/document_library/file_entry_action.jsp";
 	}
 
 	private FileEntry _fileEntry;

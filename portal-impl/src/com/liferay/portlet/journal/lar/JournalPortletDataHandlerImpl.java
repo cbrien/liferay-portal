@@ -55,6 +55,7 @@ import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.lar.DLPortletDataHandlerImpl;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.journal.ArticleContentException;
 import com.liferay.portlet.journal.FeedTargetLayoutFriendlyUrlException;
 import com.liferay.portlet.journal.NoSuchArticleException;
 import com.liferay.portlet.journal.NoSuchStructureException;
@@ -122,9 +123,9 @@ import javax.portlet.PortletPreferences;
  * @author Karthik Sudarshan
  * @author Wesley Gong
  * @author Hugo Huijser
- * @see	com.liferay.portal.kernel.lar.PortletDataHandler
- * @see	com.liferay.portlet.journal.lar.JournalContentPortletDataHandlerImpl
- * @see	com.liferay.portlet.journal.lar.JournalCreationStrategy
+ * @see    com.liferay.portal.kernel.lar.PortletDataHandler
+ * @see    com.liferay.portlet.journal.lar.JournalContentPortletDataHandlerImpl
+ * @see    com.liferay.portlet.journal.lar.JournalCreationStrategy
  */
 public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 
@@ -233,6 +234,10 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 						articleImage.getArticleImageId());
 				}
 				catch (NoSuchImageException nsie) {
+					continue;
+				}
+
+				if (image.getTextObj() == null) {
 					continue;
 				}
 
@@ -611,9 +616,7 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 			byte[] bytes = portletDataContext.getZipEntryAsByteArray(
 				smallImagePath);
 
-			smallFile = File.createTempFile(
-				String.valueOf(article.getSmallImageId()),
-				StringPool.PERIOD + article.getSmallImageType());
+			smallFile = FileUtil.createTempFile(article.getSmallImageType());
 
 			FileUtil.write(smallFile, bytes);
 		}
@@ -1263,9 +1266,8 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 				smallImagePath);
 
 			if (bytes != null) {
-				smallFile = File.createTempFile(
-					String.valueOf(template.getSmallImageId()),
-					StringPool.PERIOD + template.getSmallImageType());
+				smallFile = FileUtil.createTempFile(
+					template.getSmallImageType());
 
 				FileUtil.write(smallFile, bytes);
 			}
@@ -1399,6 +1401,11 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 	@Override
 	public boolean isAlwaysExportable() {
 		return _ALWAYS_EXPORTABLE;
+	}
+
+	@Override
+	public boolean isDataLocalized() {
+		return _DATA_LOCALIZED;
 	}
 
 	@Override
@@ -1615,8 +1622,11 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 				sb.replace(beginPos, endPos, dlReference);
 			}
 			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(e);
+				if (_log.isDebugEnabled()) {
+					_log.debug(e, e);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(e.getMessage());
 				}
 			}
 
@@ -1887,11 +1897,17 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 				newLinksToLayout.add(newLinkToLayout);
 			}
 			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(
-						"Unable to get layout with id " + layoutId +
-							" in group " + portletDataContext.getScopeGroupId(),
-						e);
+				if (_log.isDebugEnabled() || _log.isWarnEnabled()) {
+					String message =
+						"Unable to get layout with ID " + layoutId +
+							" in group " + portletDataContext.getScopeGroupId();
+
+					if (_log.isWarnEnabled()) {
+						_log.warn(message);
+					}
+					else {
+						_log.debug(message, e);
+					}
 				}
 			}
 		}
@@ -2194,8 +2210,11 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 				}
 			}
 			catch (Exception e) {
-				if (_log.isWarnEnabled()) {
-					_log.warn(e);
+				if (_log.isDebugEnabled()) {
+					_log.debug(e, e);
+				}
+				else if (_log.isWarnEnabled()) {
+					_log.warn(e.getMessage());
 				}
 			}
 
@@ -2578,7 +2597,18 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 			List<Element> articleElements = articlesElement.elements("article");
 
 			for (Element articleElement : articleElements) {
-				importArticle(portletDataContext, articleElement);
+				try {
+					importArticle(portletDataContext, articleElement);
+				}
+				catch (ArticleContentException ace) {
+					if (_log.isWarnEnabled()) {
+						String path = articleElement.attributeValue("path");
+
+						_log.warn(
+							"Skipping article with path " + path +
+								" because of invalid content");
+					}
+				}
 			}
 		}
 
@@ -2586,6 +2616,8 @@ public class JournalPortletDataHandlerImpl extends BasePortletDataHandler {
 	}
 
 	private static final boolean _ALWAYS_EXPORTABLE = true;
+
+	private static final boolean _DATA_LOCALIZED = true;
 
 	private static final String _NAMESPACE = "journal";
 

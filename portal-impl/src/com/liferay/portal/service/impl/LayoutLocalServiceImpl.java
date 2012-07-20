@@ -247,7 +247,8 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 		String layoutPrototypeUuid = ParamUtil.getString(
 			serviceContext, "layoutPrototypeUuid");
 		boolean layoutPrototypeLinkEnabled = ParamUtil.getBoolean(
-			serviceContext, "layoutPrototypeLinkEnabled", true);
+			serviceContext, "layoutPrototypeLinkEnabled",
+			PropsValues.LAYOUT_PROTOTYPE_LINK_ENABLED_DEFAULT);
 
 		if (Validator.isNotNull(layoutPrototypeUuid)) {
 			layout.setLayoutPrototypeUuid(layoutPrototypeUuid);
@@ -803,17 +804,9 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			long groupId, boolean privateLayout, long parentLayoutId)
 		throws SystemException {
 
-		Layout firstLayout = null;
-
-		try {
-			firstLayout = layoutPersistence.findByG_P_P_First(
-				groupId, privateLayout, parentLayoutId,
-				new LayoutPriorityComparator());
-		}
-		catch (NoSuchLayoutException nsle) {
-		}
-
-		return firstLayout;
+		return layoutPersistence.fetchByG_P_P_First(
+			groupId, privateLayout, parentLayoutId,
+			new LayoutPriorityComparator());
 	}
 
 	/**
@@ -1142,7 +1135,9 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 
 		int count = layoutSet.getPageCount();
 
-		if (group.isUser()) {
+		if (PropsValues.USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE &&
+			group.isUser()) {
+
 			List<UserGroup> userGroups = userPersistence.getUserGroups(
 				group.getClassPK());
 
@@ -1243,7 +1238,9 @@ public class LayoutLocalServiceImpl extends LayoutLocalServiceBaseImpl {
 			return true;
 		}
 
-		if (group.isUser()) {
+		if (PropsValues.USER_GROUPS_COPY_LAYOUTS_TO_USER_PERSONAL_SITE &&
+			group.isUser()) {
+
 			List<UserGroup> userGroups = userPersistence.getUserGroups(
 				group.getClassPK());
 

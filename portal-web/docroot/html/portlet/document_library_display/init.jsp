@@ -37,6 +37,7 @@ page import="com.liferay.portlet.documentlibrary.model.DLFileEntryConstants" %><
 page import="com.liferay.portlet.documentlibrary.model.DLFileEntryType" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFileShortcut" %><%@
 page import="com.liferay.portlet.documentlibrary.model.DLFolderConstants" %><%@
+page import="com.liferay.portlet.documentlibrary.search.EntriesChecker" %><%@
 page import="com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.service.DLAppServiceUtil" %><%@
 page import="com.liferay.portlet.documentlibrary.service.DLFileEntryTypeLocalServiceUtil" %><%@
@@ -44,7 +45,8 @@ page import="com.liferay.portlet.documentlibrary.service.permission.DLFileEntryP
 page import="com.liferay.portlet.documentlibrary.util.DLUtil" %><%@
 page import="com.liferay.portlet.journal.search.FileEntryDisplayTerms" %><%@
 page import="com.liferay.portlet.journal.search.FileEntrySearch" %><%@
-page import="com.liferay.portlet.journal.search.FileEntrySearchTerms" %>
+page import="com.liferay.portlet.journal.search.FileEntrySearchTerms" %><%@
+page import="com.liferay.portlet.trash.util.TrashUtil" %>
 
 <%
 PortletPreferences preferences = renderRequest.getPreferences();

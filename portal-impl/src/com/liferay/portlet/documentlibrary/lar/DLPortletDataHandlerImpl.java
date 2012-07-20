@@ -143,10 +143,6 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 		}
 
 		if (!portletDataContext.isPerformDirectBinaryImport()) {
-			String binPath = getFileEntryBinPath(portletDataContext, fileEntry);
-
-			fileEntryElement.addAttribute("bin-path", binPath);
-
 			InputStream is = null;
 
 			try {
@@ -168,7 +164,12 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 			}
 
 			try {
+				String binPath = getFileEntryBinPath(
+					portletDataContext, fileEntry);
+
 				portletDataContext.addZipEntry(binPath, is);
+
+				fileEntryElement.addAttribute("bin-path", binPath);
 			}
 			finally {
 				try {
@@ -304,10 +305,24 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 		if (Validator.isNull(binPath) &&
 			portletDataContext.isPerformDirectBinaryImport()) {
 
-			is = FileEntryUtil.getContentStream(fileEntry);
+			try {
+				is = FileEntryUtil.getContentStream(fileEntry);
+			}
+			catch (NoSuchFileException nsfe) {
+			}
 		}
 		else {
 			is = portletDataContext.getZipEntryAsInputStream(binPath);
+		}
+
+		if (is == null) {
+			if (_log.isWarnEnabled()) {
+				_log.warn(
+					"No file found for file entry " +
+						fileEntry.getFileEntryId());
+			}
+
+			return;
 		}
 
 		if ((folderId != DLFolderConstants.DEFAULT_PARENT_FOLDER_ID) &&
@@ -427,13 +442,11 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 
 					serviceContext.setUuid(fileVersion.getUuid());
 
-					importedFileEntry =
-						DLAppLocalServiceUtil.updateFileEntry(
-							userId, existingFileEntry.getFileEntryId(),
-							fileEntry.getTitle(), fileEntry.getMimeType(),
-							fileEntry.getTitle(), fileEntry.getDescription(),
-							null, false, is, fileEntry.getSize(),
-							serviceContext);
+					importedFileEntry = DLAppLocalServiceUtil.updateFileEntry(
+						userId, existingFileEntry.getFileEntryId(),
+						fileEntry.getTitle(), fileEntry.getMimeType(),
+						fileEntry.getTitle(), fileEntry.getDescription(), null,
+						false, is, fileEntry.getSize(), serviceContext);
 				}
 				else {
 					DLAppLocalServiceUtil.updateAsset(
@@ -671,6 +684,11 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 	}
 
 	@Override
+	public String[] getDataPortletPreferences() {
+		return new String[] {"rootFolderId"};
+	}
+
+	@Override
 	public PortletDataHandlerControl[] getExportControls() {
 		return new PortletDataHandlerControl[] {
 			_foldersAndDocuments, _shortcuts, _previewsAndThumbnails, _ranks
@@ -703,6 +721,11 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 	@Override
 	public boolean isAlwaysExportable() {
 		return _ALWAYS_EXPORTABLE;
+	}
+
+	@Override
+	public boolean isDataLocalized() {
+		return _DATA_LOCALIZED;
 	}
 
 	@Override
@@ -1134,10 +1157,10 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 	}
 
 	/**
-	 * @see {@link PortletImporter#getAssetCategoryName(String, long, long,
-	 *	  String, int)}
-	 * @see {@link PortletImporter#getAssetVocabularyName(String, long, String,
-	 *	  int)}
+	 * @see com.liferay.portal.lar.PortletImporter#getAssetCategoryName(String,
+	 *      long, long, String, int)
+	 * @see com.liferay.portal.lar.PortletImporter#getAssetVocabularyName(
+	 *      String, long, String, int)
 	 */
 	protected static String getFileEntryTypeName(
 			String uuid, long groupId, String name, int count)
@@ -1205,10 +1228,10 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 	}
 
 	/**
-	 * @see {@link PortletImporter#getAssetCategoryName(String, long, long,
-	 *	  String, int)}
-	 * @see {@link PortletImporter#getAssetVocabularyName(String, long, String,
-	 *	  int)}
+	 * @see com.liferay.portal.lar.PortletImporter#getAssetCategoryName(String,
+	 *      long, long, String, int)
+	 * @see com.liferay.portal.lar.PortletImporter#getAssetVocabularyName(
+	 *      String, long, String, int)
 	 */
 	protected static String getFolderName(
 			String uuid, long groupId, long parentFolderId, String name,
@@ -1658,7 +1681,7 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 		for (DDMStructure ddmStructure : ddmStructures) {
 			Element structureFieldsElement =
 				(Element)fileEntryElement.selectSingleNode(
-					"//structure-fields[@structureUuid='".concat(
+					"structure-fields[@structureUuid='".concat(
 						ddmStructure.getUuid()).concat("']"));
 
 			if (structureFieldsElement == null) {
@@ -1896,6 +1919,8 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 	}
 
 	private static final boolean _ALWAYS_EXPORTABLE = true;
+
+	private static final boolean _DATA_LOCALIZED = true;
 
 	private static final String _NAMESPACE = "document_library";
 

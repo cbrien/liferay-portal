@@ -162,6 +162,12 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 		deleteFolder(dlFolder);
 	}
 
+	public DLFolder fetchFolder(long groupId, long parentFolderId, String name)
+		throws SystemException {
+
+		return dlFolderPersistence.fetchByG_P_N(groupId, parentFolderId, name);
+	}
+
 	public List<DLFolder> getCompanyFolders(long companyId, int start, int end)
 		throws SystemException {
 
@@ -596,6 +602,15 @@ public class DLFolderLocalServiceImpl extends DLFolderLocalServiceBaseImpl {
 
 		dlAppHelperLocalService.updateStatuses(
 			user, foldersAndFileEntriesAndFileShortcuts, status);
+
+		// Trash
+
+		if (status == WorkflowConstants.STATUS_IN_TRASH) {
+			trashEntryLocalService.addTrashEntry(
+				userId, dlFolder.getGroupId(), DLFolderConstants.getClassName(),
+				dlFolder.getFolderId(), WorkflowConstants.STATUS_APPROVED, null,
+				null);
+		}
 
 		return dlFolder;
 	}

@@ -201,6 +201,8 @@ public interface PropsKeys {
 
 	public static final String BASIC_AUTH_PASSWORD_REQUIRED = "basic.auth.password.required";
 
+	public static final String BLOGS_DISPLAY_STYLES_TEMPLATE_CONTENT = "blogs.display.styles.template.content";
+
 	public static final String BLOGS_EMAIL_ENTRY_ADDED_BODY = "blogs.email.entry.added.body";
 
 	public static final String BLOGS_EMAIL_ENTRY_ADDED_ENABLED = "blogs.email.entry.added.enabled";
@@ -384,6 +386,8 @@ public interface PropsKeys {
 	public static final String COMPANY_SECURITY_AUTO_LOGIN = "company.security.auto.login";
 
 	public static final String COMPANY_SECURITY_AUTO_LOGIN_MAX_AGE = "company.security.auto.login.max.age";
+
+	public static final String COMPANY_SECURITY_LOGIN_FORM_AUTOCOMPLETE = "company.security.login.form.autocomplete";
 
 	public static final String COMPANY_SECURITY_SEND_PASSWORD = "company.security.send.password";
 
@@ -679,6 +683,8 @@ public interface PropsKeys {
 
 	public static final String DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_TYPES = "dynamic.data.mapping.template.language.types";
 
+	public static final String DYNAMIC_RESOURCE_SERVLET_ALLOWED_PATHS = "dynamic.resource.servlet.allowed.paths";
+
 	public static final String EDITOR_WYSIWYG_DEFAULT = "editor.wysiwyg.default";
 
 	public static final String EHCACHE_BLOCKING_CACHE_ALLOWED = "ehcache.blocking.cache.allowed";
@@ -741,13 +747,11 @@ public interface PropsKeys {
 
 	public static final String FREEMARKER_ENGINE_CACHE_ENABLED = "freemarker.engine.cache.enabled";
 
-	public static final String FREEMARKER_ENGINE_CACHE_STORAGE = "freemarker.engine.cache.storage";
-
 	public static final String FREEMARKER_ENGINE_LOCALIZED_LOOKUP = "freemarker.engine.localized.lookup";
 
 	public static final String FREEMARKER_ENGINE_MACRO_LIBRARY = "freemarker.engine.macro.library";
 
-	public static final String FREEMARKER_ENGINE_MODIFICATION_CHECK_INTERVAL = "freemarker.engine.modification.check.interval";
+	public static final String FREEMARKER_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL = "freemarker.engine.resource.modification.check.interval";
 
 	public static final String FREEMARKER_ENGINE_RESTRICTED_CLASSES = "freemarker.engine.restricted.classes";
 
@@ -755,7 +759,7 @@ public interface PropsKeys {
 
 	public static final String FREEMARKER_ENGINE_TEMPLATE_EXCEPTION_HANDLER = "freemarker.engine.template.exception.handler";
 
-	public static final String FREEMARKER_ENGINE_TEMPLATE_LOADERS = "freemarker.engine.template.loaders";
+	public static final String FREEMARKER_ENGINE_TEMPLATE_PARSERS = "freemarker.engine.template.parsers";
 
 	public static final String GLOBAL_SHUTDOWN_EVENTS = "global.shutdown.events";
 
@@ -826,8 +830,6 @@ public interface PropsKeys {
 	public static final String INDEX_DUMP_COMPRESSION_ENABLED = "index.dump.compression.enabled";
 
 	public static final String INDEX_FILTER_SEARCH_LIMIT = "index.filter.search.limit";
-
-	public static final String INDEX_FORCE_GC_BEFORE_DELETE = "index.force.gc.before.delete";
 
 	public static final String INDEX_ON_STARTUP = "index.on.startup";
 
@@ -1104,6 +1106,8 @@ public interface PropsKeys {
 	public static final String LAYOUT_PARALLEL_RENDER_TIMEOUT = "layout.parallel.render.timeout";
 
 	public static final String LAYOUT_PARENTABLE = "layout.parentable";
+
+	public static final String LAYOUT_PROTOTYPE_LINK_ENABLED_DEFAULT = "layout.prototype.link.enabled.default";
 
 	public static final String LAYOUT_PROTOTYPE_MERGE_FAIL_THRESHOLD = "layout.prototype.merge.fail.threshold";
 
@@ -1445,6 +1449,10 @@ public interface PropsKeys {
 
 	public static final String MIME_TYPES_CONTENT_DISPOSITION_INLINE = "mime.types.content.disposition.inline";
 
+	public static final String MINIFIER_ENABLED = "minifier.enabled";
+
+	public static final String MINIFIER_FILES_LIMIT = "minifier.files.limit";
+
 	public static final String MINIFIER_INLINE_CONTENT_CACHE_SIZE = "minifier.inline.content.cache.size";
 
 	public static final String MINIFIER_INLINE_CONTENT_CACHE_SKIP_CSS = "minifier.inline.content.cache.skip.css";
@@ -1454,6 +1462,22 @@ public interface PropsKeys {
 	public static final String MOBILE_DEVICE_RULES_RULE_GROUP_COPY_POSTFIX = "mobile.device.rules.rule.group.copy.postfix";
 
 	public static final String MODEL_HINTS_CONFIGS = "model.hints.configs";
+
+	public static final String MODULE_FRAMEWORK_BEGINNING_START_LEVEL = "module.framework.beginning.start.level";
+
+	public static final String MODULE_FRAMEWORK_ENABLED = "module.framework.enabled";
+
+	public static final String MODULE_FRAMEWORK_LIB_DIR = "module.framework.lib.dir";
+
+	public static final String MODULE_FRAMEWORK_REGISTER_LIFERAY_SERVICES = "module.framework.register.liferay.services";
+
+	public static final String MODULE_FRAMEWORK_RUNTIME_START_LEVEL = "module.framework.runtime.start.level";
+
+	public static final String MODULE_FRAMEWORK_STATE_DIR = "module.framework.state.dir";
+
+	public static final String MODULE_FRAMEWORK_SYSTEM_BUNDLE_EXPORT_PACKAGES = "module.framework.system.bundle.export.packages";
+
+	public static final String MODULE_FRAMEWORK_SYSTEM_PACKAGES_EXTRA = "module.framework.system.packages.extra";
 
 	public static final String MONITORING_DATA_SAMPLE_THREAD_LOCAL = "monitoring.data.sample.thread.local";
 
@@ -1578,20 +1602,6 @@ public interface PropsKeys {
 	public static final String ORGANIZATIONS_SEARCH_WITH_INDEX = "organizations.search.with.index";
 
 	public static final String ORGANIZATIONS_TYPES = "organizations.types";
-
-	public static final String OSGI_ENABLED = "osgi.enabled";
-
-	public static final String OSGI_FRAMEWORK_BEGINNING_START_LEVEL = "osgi.framework.beginning.start.level";
-
-	public static final String OSGI_FRAMEWORK_RUNTIME_START_LEVEL = "osgi.framework.runtime.start.level";
-
-	public static final String OSGI_FRAMEWORK_STORAGE = "osgi.framework.storage";
-
-	public static final String OSGI_REGISTER_LIFERAY_SERVICES = "osgi.register.liferay.services";
-
-	public static final String OSGI_SYSTEM_BUNDLE_EXPORT_PACKAGES = "osgi.system.bundle.export.packages";
-
-	public static final String OSGI_SYSTEM_PACKAGES_EXTRA = "osgi.system.packages.extra";
 
 	public static final String PASSWORDS_DEFAULT_POLICY_ALLOW_DICTIONARY_WORDS = "passwords.default.policy.allow.dictionary.words";
 
@@ -1735,6 +1745,8 @@ public interface PropsKeys {
 
 	public static final String PORTAL_SECURITY_MANAGER_FILE_CHECKER_DEFAULT_READ_PATHS = "portal.security.manager.file.checker.default.read.paths";
 
+	public static final String PORTAL_SECURITY_MANAGER_PRELOAD_CLASSLOADER_CLASSES = "portal.security.manager.preload.classloader.classes";
+
 	public static final String PORTAL_SECURITY_MANAGER_STRATEGY = "portal.security.manager.strategy";
 
 	public static final String PORTLET_ADD_DEFAULT_RESOURCE_CHECK_ENABLED = "portlet.add.default.resource.check.enabled";
@@ -1768,6 +1780,10 @@ public interface PropsKeys {
 	public static final String PREFERENCE_VALIDATE_ON_STARTUP = "preference.validate.on.startup";
 
 	public static final String RATINGS_DEFAULT_NUMBER_OF_STARS = "ratings.default.number.of.stars";
+
+	public static final String RATINGS_MAX_SCORE = "ratings.max.score";
+
+	public static final String RATINGS_MIN_SCORE = "ratings.min.score";
 
 	public static final String REDIRECT_URL_DOMAINS_ALLOWED = "redirect.url.domains.allowed";
 
@@ -1868,6 +1884,10 @@ public interface PropsKeys {
 	public static final String SERVLET_SESSION_CREATE_EVENTS = "servlet.session.create.events";
 
 	public static final String SERVLET_SESSION_DESTROY_EVENTS = "servlet.session.destroy.events";
+
+	public static final String SESSION_CLICKS_MAX_ALLOWED_VALUES = "session.clicks.max.allowed.values";
+
+	public static final String SESSION_CLICKS_MAX_SIZE_TERMS = "session.clicks.max.size.terms";
 
 	public static final String SESSION_COOKIE_DOMAIN = "session.cookie.domain";
 
@@ -2057,6 +2077,8 @@ public interface PropsKeys {
 
 	public static final String SQL_DATA_MAX_PARAMETERS = "sql.data.max.parameters";
 
+	public static final String STAGING_LOCK_ENABLED = "staging.lock.enabled";
+
 	public static final String STRIP_CSS_SASS_ENABLED = "strip.css.sass.enabled";
 
 	public static final String STRIP_IGNORE_PATHS = "strip.ignore.paths";
@@ -2123,6 +2145,10 @@ public interface PropsKeys {
 
 	public static final String TRANSLATOR_LANGUAGES = "translator.languages";
 
+	public static final String TRASH_ENABLED = "trash.enabled";
+
+	public static final String TRASH_ENTRIES_MAX_AGE = "trash.entries.max.age";
+
 	public static final String TRASH_SEARCH_LIMIT = "trash.search.limit";
 
 	public static final String UPGRADE_PROCESSES = "upgrade.processes";
@@ -2144,6 +2170,8 @@ public interface PropsKeys {
 	public static final String USERS_EMAIL_ADDRESS_GENERATOR = "users.email.address.generator";
 
 	public static final String USERS_EMAIL_ADDRESS_REQUIRED = "users.email.address.required";
+
+	public static final String USERS_EMAIL_ADDRESS_VALIDATOR = "users.email.address.validator";
 
 	public static final String USERS_EXPORT_CSV_FIELDS = "users.export.csv.fields";
 
@@ -2221,15 +2249,13 @@ public interface PropsKeys {
 
 	public static final String VELOCITY_ENGINE_LOGGER_CATEGORY = "velocity.engine.logger.category";
 
-	public static final String VELOCITY_ENGINE_RESOURCE_LISTENERS = "velocity.engine.resource.listeners";
-
 	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER = "velocity.engine.resource.manager";
-
-	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER_CACHE = "velocity.engine.resource.manager.cache";
 
 	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER_CACHE_ENABLED = "velocity.engine.resource.manager.cache.enabled";
 
-	public static final String VELOCITY_ENGINE_RESOURCE_MANAGER_MODIFICATION_CHECK_INTERVAL = "velocity.engine.resource.manager.modification.check.interval";
+	public static final String VELOCITY_ENGINE_RESOURCE_MODIFICATION_CHECK_INTERVAL = "velocity.engine.resource.modification.check.interval";
+
+	public static final String VELOCITY_ENGINE_RESOURCE_PARSERS = "velocity.engine.resource.parsers";
 
 	public static final String VELOCITY_ENGINE_RESTRICTED_CLASSES = "velocity.engine.restricted.classes";
 
@@ -2264,8 +2290,6 @@ public interface PropsKeys {
 	public static final String WEB_SERVER_SERVLET_ACCEPT_RANGES_MIME_TYPES = "web.server.servlet.accept.ranges.mime.types";
 
 	public static final String WEB_SERVER_SERVLET_DIRECTORY_INDEXING_ENABLED = "web.server.servlet.directory.indexing.enabled";
-
-	public static final String WEB_SERVER_SERVLET_HTTP_STATUS_CODE_STRICT = "web.server.servlet.http.status.code.strict";
 
 	public static final String WEB_SERVER_SERVLET_MAX_RANGE_FIELDS = "web.server.servlet.max.range.fields";
 
@@ -2325,6 +2349,10 @@ public interface PropsKeys {
 
 	public static final String WIKI_PAGE_COMMENTS_ENABLED = "wiki.page.comments.enabled";
 
+	public static final String WIKI_PAGE_MINOR_EDIT_ADD_SOCIAL_ACTIVITY = "wiki.page.minor.edit.add.social.activity";
+
+	public static final String WIKI_PAGE_MINOR_EDIT_SEND_EMAIL = "wiki.page.minor.edit.send.email";
+
 	public static final String WIKI_PAGE_RATINGS_ENABLED = "wiki.page.ratings.enabled";
 
 	public static final String WIKI_PAGE_TITLES_REGEXP = "wiki.page.titles.regexp";
@@ -2350,5 +2378,17 @@ public interface PropsKeys {
 	public static final String YM_LOGIN = "ym.login";
 
 	public static final String YM_PASSWORD = "ym.password";
+
+	public static final String YUI_COMPRESSOR_CSS_LINE_BREAK = "yui.compressor.css.line.break";
+
+	public static final String YUI_COMPRESSOR_JS_DISABLE_OPTIMIZATIONS = "yui.compressor.js.disable.optimizations";
+
+	public static final String YUI_COMPRESSOR_JS_LINE_BREAK = "yui.compressor.js.line.break";
+
+	public static final String YUI_COMPRESSOR_JS_MUNGE = "yui.compressor.js.munge";
+
+	public static final String YUI_COMPRESSOR_JS_PRESERVE_ALL_SEMICOLONS = "yui.compressor.js.preserve.all.semicolons";
+
+	public static final String YUI_COMPRESSOR_JS_VERBOSE = "yui.compressor.js.verbose";
 
 }

@@ -186,7 +186,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 							String thumbnailSrc = DLUtil.getThumbnailSrc(fileEntry, fileVersion, dlFileShortcut, themeDisplay);
 
 							if (layoutAssetEntry != null) {
-								AssetEntry incrementAssetEntry = AssetEntryServiceUtil.incrementViewCounter(layoutAssetEntry.getClassName(), assetClassPK);
+								AssetEntry incrementAssetEntry = AssetEntryServiceUtil.incrementViewCounter(layoutAssetEntry.getClassName(), fileEntry.getFileEntryId());
 
 								if (incrementAssetEntry != null) {
 									layoutAssetEntry = incrementAssetEntry;
@@ -445,7 +445,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 						</h3>
 
 						<div class="lfr-asset-icon lfr-asset-author">
-							<liferay-ui:message arguments="<%= HtmlUtil.escape(fileVersion.getUserName()) %>" key="last-updated-by-x" />
+							<liferay-ui:message arguments="<%= HtmlUtil.escape(fileVersion.getStatusByUserName()) %>" key="last-updated-by-x" />
 						</div>
 
 						<div class="lfr-asset-icon lfr-asset-date">
@@ -936,7 +936,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 			);
 		</c:if>
 
-		<c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) && (fileEntry.getModel() instanceof DLFileEntry) %>">
+		<c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) && (fileEntry.getModel() instanceof DLFileEntry) && TrashUtil.isTrashEnabled(themeDisplay.getScopeGroupId()) %>">
 			fileEntryToolbarChildren.push(
 				{
 					<portlet:renderURL var="viewFolderURL">
@@ -945,11 +945,9 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 					</portlet:renderURL>
 
 					handler: function(event) {
-						if (confirm('<%= UnicodeLanguageUtil.get(pageContext, "are-you-sure-you-want-to-move-this-entry-to-the-recycle-bin") %>')) {
-							document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= Constants.MOVE_TO_TRASH %>';
-							document.<portlet:namespace />fm.<portlet:namespace />redirect.value = '<%= viewFolderURL.toString() %>';
-							submitForm(document.<portlet:namespace />fm);
-						}
+						document.<portlet:namespace />fm.<portlet:namespace /><%= Constants.CMD %>.value = '<%= Constants.MOVE_TO_TRASH %>';
+						document.<portlet:namespace />fm.<portlet:namespace />redirect.value = '<%= viewFolderURL.toString() %>';
+						submitForm(document.<portlet:namespace />fm);
 					},
 					icon: 'delete',
 					label: '<%= UnicodeLanguageUtil.get(pageContext, "move-to-the-recycle-bin") %>'
@@ -957,7 +955,7 @@ request.setAttribute("view_file_entry.jsp-fileEntry", fileEntry);
 			);
 		</c:if>
 
-		<c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) && !(fileEntry.getModel() instanceof DLFileEntry) %>">
+		<c:if test="<%= DLFileEntryPermission.contains(permissionChecker, fileEntry, ActionKeys.DELETE) && (!(fileEntry.getModel() instanceof DLFileEntry) || !TrashUtil.isTrashEnabled(themeDisplay.getScopeGroupId())) %>">
 			fileEntryToolbarChildren.push(
 				{
 					<portlet:renderURL var="viewFolderURL">

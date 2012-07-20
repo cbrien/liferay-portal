@@ -38,6 +38,8 @@ import com.liferay.portal.kernel.search.IndexerRegistryUtil;
 import com.liferay.portal.kernel.search.OpenSearch;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.servlet.URLEncoder;
+import com.liferay.portal.kernel.template.PortletDisplayTemplateHandler;
+import com.liferay.portal.kernel.template.PortletDisplayTemplateHandlerRegistryUtil;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -147,6 +149,14 @@ public class PortletBagFactory {
 		PortletDataHandler portletDataHandlerInstance = newPortletDataHandler(
 			portlet);
 
+		PortletDisplayTemplateHandler portletDisplayTemplateHandlerInstance =
+			newPortletDisplayTemplateHandler(portlet);
+
+		if (portletDisplayTemplateHandlerInstance != null) {
+			PortletDisplayTemplateHandlerRegistryUtil.register(
+				portletDisplayTemplateHandlerInstance);
+		}
+
 		PortletLayoutListener portletLayoutListenerInstance =
 			newPortletLayoutListener(portlet);
 
@@ -234,9 +244,8 @@ public class PortletBagFactory {
 			new ArrayList<TrashHandler>();
 
 		for (String trashHandlerClass : portlet.getTrashHandlerClasses()) {
-			TrashHandler trashHandlerInstance =
-				(TrashHandler)newInstance(
-					TrashHandler.class, trashHandlerClass);
+			TrashHandler trashHandlerInstance = (TrashHandler)newInstance(
+				TrashHandler.class, trashHandlerClass);
 
 			trashHandlerInstances.add(trashHandlerInstance);
 
@@ -308,15 +317,15 @@ public class PortletBagFactory {
 			portlet.getPortletId(), _servletContext, portletInstance,
 			configurationActionInstance, indexerInstances, openSearchInstance,
 			friendlyURLMapperInstance, urlEncoderInstance,
-			portletDataHandlerInstance, portletLayoutListenerInstance,
-			pollerProcessorInstance, popMessageListenerInstance,
-			socialActivityInterpreterInstance, socialRequestInterpreterInstance,
-			webDAVStorageInstance, xmlRpcMethodInstance,
-			controlPanelEntryInstance, assetRendererFactoryInstances,
-			atomCollectionAdapterInstances, customAttributesDisplayInstances,
-			permissionPropagatorInstance, trashHandlerInstances,
-			workflowHandlerInstances, preferencesValidatorInstance,
-			resourceBundles);
+			portletDataHandlerInstance, portletDisplayTemplateHandlerInstance,
+			portletLayoutListenerInstance, pollerProcessorInstance,
+			popMessageListenerInstance, socialActivityInterpreterInstance,
+			socialRequestInterpreterInstance, webDAVStorageInstance,
+			xmlRpcMethodInstance, controlPanelEntryInstance,
+			assetRendererFactoryInstances, atomCollectionAdapterInstances,
+			customAttributesDisplayInstances, permissionPropagatorInstance,
+			trashHandlerInstances, workflowHandlerInstances,
+			preferencesValidatorInstance, resourceBundles);
 
 		PortletBagPool.put(portlet.getRootPortletId(), portletBag);
 
@@ -544,9 +553,8 @@ public class PortletBagFactory {
 				SocialActivityInterpreter.class,
 				portlet.getSocialActivityInterpreterClass());
 
-		socialActivityInterpreterInstance =
-			new SocialActivityInterpreterImpl(
-				portlet.getPortletId(), socialActivityInterpreterInstance);
+		socialActivityInterpreterInstance = new SocialActivityInterpreterImpl(
+			portlet.getPortletId(), socialActivityInterpreterInstance);
 
 		SocialActivityInterpreterLocalServiceUtil.addActivityInterpreter(
 			socialActivityInterpreterInstance);
@@ -822,6 +830,19 @@ public class PortletBagFactory {
 
 		return (PortletDataHandler)newInstance(
 			PortletDataHandler.class, portlet.getPortletDataHandlerClass());
+	}
+
+	protected PortletDisplayTemplateHandler newPortletDisplayTemplateHandler(
+			Portlet portlet)
+		throws Exception {
+
+		if (Validator.isNull(portlet.getPortletDisplayTemplateHandlerClass())) {
+			return null;
+		}
+
+		return (PortletDisplayTemplateHandler)newInstance(
+			PortletDisplayTemplateHandler.class,
+			portlet.getPortletDisplayTemplateHandlerClass());
 	}
 
 	protected PortletLayoutListener newPortletLayoutListener(Portlet portlet)

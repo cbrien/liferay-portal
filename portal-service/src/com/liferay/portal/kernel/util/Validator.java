@@ -440,13 +440,31 @@ public class Validator {
 
 		// LEP-1445
 
-		for (int i = 0; i < _EMAIL_ADDRESS_SPECIAL_CHAR.length; i++) {
-			if (c == _EMAIL_ADDRESS_SPECIAL_CHAR[i]) {
+		for (char specialChar : _EMAIL_ADDRESS_SPECIAL_CHAR) {
+			if (c == specialChar) {
 				return true;
 			}
 		}
 
 		return false;
+	}
+
+	/**
+	 * Returns <code>true</code> if the file extension is valid.
+	 *
+	 * @param  fileExtension file extension
+	 * @return <code>true</code> if the extension is valid; <code>false</code>
+	 *         otherwise
+	 */
+	public static boolean isFileExtension(String fileExtension) {
+		if (isNull(fileExtension) || fileExtension.contains(StringPool.SLASH) ||
+			fileExtension.contains(StringPool.BACK_SLASH) ||
+			fileExtension.contains(StringPool.NULL_CHAR)) {
+
+			return false;
+		}
+
+		return true;
 	}
 
 	/**
@@ -525,8 +543,9 @@ public class Validator {
 		}
 
 		for (char c : nameCharArray) {
-			if (!isChar(c) && !isDigit(c) && (c != CharPool.DASH) &&
-				(c != CharPool.PERIOD)) {
+			if (!isChar(c) && !isDigit(c) && (c != CharPool.CLOSE_BRACKET) &&
+				(c != CharPool.COLON) && (c != CharPool.DASH) &&
+				(c != CharPool.OPEN_BRACKET) && (c != CharPool.PERIOD)) {
 
 				return false;
 			}
@@ -630,8 +649,9 @@ public class Validator {
 				if (x >= 10) {
 					String s = String.valueOf(x);
 
-					x = Integer.parseInt(s.substring(0, 1)) +
-						Integer.parseInt(s.substring(1, 2));
+					x =
+						Integer.parseInt(s.substring(0, 1)) +
+							Integer.parseInt(s.substring(1, 2));
 				}
 			}
 			else {
