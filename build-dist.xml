@@ -886,13 +886,13 @@ release was successful.</echo>
 		</unzip>
 
 		<if>
-			<equals arg1="${app.server.glassfish.version}" arg2="3.1.2" />
+			<equals arg1="${app.server.glassfish.version}" arg2="3.1.2.2" />
 			<then>
 
-				<!-- GLASSFISH-18444 -->
+				<!-- GLASSFISH-19008 -->
 
 				<zip
-					basedir="tools/servers/glassfish/patches/GLASSFISH-18444/classes"
+					basedir="tools/servers/glassfish/patches/GLASSFISH-19008/classes"
 					destfile="${app.server.glassfish.dir}/modules/web-core.jar"
 					update="yes"
 				/>
@@ -1318,6 +1318,21 @@ release was successful.</echo>
 			<replacevalue><![CDATA[jvm_args  : -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -Duser.timezone=GMT -Xmx1024m -XX:MaxPermSize=256m]]></replacevalue>
 		</replace>
 
+		<replace file="${app.server.resin.dir}/conf/resin.xml">
+			<replacetoken><![CDATA[xmlns:resin="urn:java:com.caucho.resin">]]></replacetoken>
+			<replacevalue>
+				<![CDATA[
+					xmlns:resin="urn:java:com.caucho.resin">
+
+					<class-loader>
+						<tree-loader path="${resin.root}/ext-lib" />
+						<tree-loader path="${resin.root}/resin-inf" />
+						<tree-loader path="cloud:/resin-inf" />
+					</class-loader>
+				 ]]>
+				</replacevalue>
+		</replace>
+
 		<copy
 			file="tools/servers/resin/bin/run.bat"
 			tofile="${app.server.resin.bin.dir}/run.bat"
@@ -1439,14 +1454,14 @@ release was successful.</echo>
 		<propertyregex
 			input="${app.server.weblogic.dir.windows}"
 			property="app.server.weblogic.dir.windows.double.slash"
-			regexp="\\" 
+			regexp="\\"
 			replace="\\\\\\\\"
 		/>
 
 		<propertyregex
 			input="${app.server.weblogic.dir.windows.double.slash}"
 			property="app.server.weblogic.dir.windows.escaped"
-			regexp=":" 
+			regexp=":"
 			replace="\\\\:"
 		/>
 
@@ -1656,14 +1671,14 @@ ${env.JAVA_HOME}/bin/java weblogic.WLST create-weblogic-domain.py</echo>
 		<propertyregex
 			input="${app.server.websphere.dir.windows}"
 			property="app.server.websphere.dir.windows.double.slash"
-			regexp="\\" 
+			regexp="\\"
 			replace="\\\\\\\\"
 		/>
 
 		<propertyregex
 			input="${app.server.websphere.dir.windows.double.slash}"
 			property="app.server.websphere.dir.windows.escaped"
-			regexp=":" 
+			regexp=":"
 			replace="\\\\:"
 		/>
 
@@ -2344,28 +2359,28 @@ plugins.includes=</echo>
 		<propertyregex
 			input="${app.server.parent.dir.windows}"
 			property="app.server.parent.dir.windows.double.slash"
-			regexp="\\" 
+			regexp="\\"
 			replace="\\\\\\\\"
 		/>
 
 		<propertyregex
 			input="${app.server.parent.dir.windows.double.slash}"
 			property="app.server.parent.dir.windows.escaped"
-			regexp=":" 
+			regexp=":"
 			replace="\\\\:"
 		/>
 
 		<propertyregex
 			input="${app.server.weblogic.dir.windows}"
 			property="app.server.weblogic.dir.windows.double.slash"
-			regexp="\\" 
+			regexp="\\"
 			replace="\\\\\\\\"
 		/>
 
 		<propertyregex
 			input="${app.server.weblogic.dir.windows.double.slash}"
 			property="app.server.weblogic.dir.windows.escaped"
-			regexp=":" 
+			regexp=":"
 			replace="\\\\:"
 		/>
 
@@ -2403,14 +2418,14 @@ plugins.includes=</echo>
 		<propertyregex
 			input="${app.server.websphere.dir.windows}"
 			property="app.server.websphere.dir.windows.double.slash"
-			regexp="\\" 
+			regexp="\\"
 			replace="\\\\\\\\"
 		/>
 
 		<propertyregex
 			input="${app.server.websphere.dir.windows.double.slash}"
 			property="app.server.websphere.dir.windows.escaped"
-			regexp=":" 
+			regexp=":"
 			replace="\\\\:"
 		/>
 

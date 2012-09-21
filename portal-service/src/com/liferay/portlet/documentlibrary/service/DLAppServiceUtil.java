@@ -1716,12 +1716,19 @@ public class DLAppServiceUtil {
 				   .getTempFileEntryNames(groupId, folderId, tempFolderName);
 	}
 
+	/**
+	* @deprecated {@link #checkOutFileEntry(long, ServiceContext)}
+	*/
 	public static com.liferay.portal.model.Lock lockFileEntry(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().lockFileEntry(fileEntryId);
 	}
 
+	/**
+	* @deprecated {@link #checkOutFileEntry(long, String, long,
+	ServiceContext)}
+	*/
 	public static com.liferay.portal.model.Lock lockFileEntry(
 		long fileEntryId, java.lang.String owner, long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -1837,13 +1844,13 @@ public class DLAppServiceUtil {
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutFromTrash(
-		long fileShortcutId, long newFolderId, long toFileEntryId,
+		long fileShortcutId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService()
 				   .moveFileShortcutFromTrash(fileShortcutId, newFolderId,
-			toFileEntryId, serviceContext);
+			serviceContext);
 	}
 
 	/**
@@ -2027,12 +2034,19 @@ public class DLAppServiceUtil {
 		return getService().search(repositoryId, searchContext, query);
 	}
 
+	/**
+	* @deprecated Use {@link #checkInFileEntry(long, boolean, String,
+	ServiceContext)}.
+	*/
 	public static void unlockFileEntry(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().unlockFileEntry(fileEntryId);
 	}
 
+	/**
+	* @deprecated Use {@link #checkInFileEntry(long, String)}.
+	*/
 	public static void unlockFileEntry(long fileEntryId,
 		java.lang.String lockUuid)
 		throws com.liferay.portal.kernel.exception.PortalException,

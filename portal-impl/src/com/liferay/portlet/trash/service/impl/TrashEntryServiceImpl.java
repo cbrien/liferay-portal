@@ -18,11 +18,6 @@ import com.liferay.portal.kernel.dao.orm.QueryUtil;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.search.Hits;
-import com.liferay.portal.kernel.search.Indexer;
-import com.liferay.portal.kernel.search.IndexerRegistryUtil;
-import com.liferay.portal.kernel.search.SearchContext;
-import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.trash.TrashRenderer;
@@ -52,8 +47,8 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 * permissions.
 	 *
 	 * @param  groupId the primary key of the group
-	 * @throws SystemException if a system exception occurred
 	 * @throws PrincipalException if a principal exception occurred
+	 * @throws SystemException if a system exception occurred
 	 */
 	public void deleteEntries(long groupId)
 		throws PrincipalException, SystemException {
@@ -88,8 +83,8 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 *
 	 * @param  groupId the primary key of the group
 	 * @return the matching trash entries
-	 * @throws SystemException if a system exception occurred
 	 * @throws PrincipalException if a principal exception occurred
+	 * @throws SystemException if a system exception occurred
 	 */
 	public TrashEntryList getEntries(long groupId)
 		throws PrincipalException, SystemException {
@@ -108,8 +103,8 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 	 *         <code>null</code>)
 	 * @return the range of matching trash entries ordered by comparator
 	 *         <code>obc</code>
-	 * @throws SystemException if a system exception occurred
 	 * @throws PrincipalException if a system exception occurred
+	 * @throws SystemException if a system exception occurred
 	 */
 	public TrashEntryList getEntries(
 			long groupId, int start, int end, OrderByComparator obc)
@@ -168,36 +163,6 @@ public class TrashEntryServiceImpl extends TrashEntryServiceBaseImpl {
 		trashEntriesList.setCount(filteredEntriesCount);
 
 		return trashEntriesList;
-	}
-
-	public Hits search(
-			long companyId, long groupId, long userId, String keywords,
-			int start, int end, Sort sort)
-		throws SystemException {
-
-		try {
-			SearchContext searchContext = new SearchContext();
-
-			searchContext.setCompanyId(companyId);
-			searchContext.setEnd(end);
-			searchContext.setKeywords(keywords);
-			searchContext.setGroupIds(new long[] {groupId});
-
-			if (sort != null) {
-				searchContext.setSorts(new Sort[] {sort});
-			}
-
-			searchContext.setStart(start);
-			searchContext.setUserId(userId);
-
-			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
-				TrashEntry.class);
-
-			return indexer.search(searchContext);
-		}
-		catch (Exception e) {
-			throw new SystemException(e);
-		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(

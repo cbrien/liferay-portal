@@ -40,10 +40,8 @@ import com.liferay.portal.kernel.search.SearchException;
 import com.liferay.portal.kernel.search.Summary;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
-import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
-import com.liferay.portal.kernel.util.StringUtil;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.model.Group;
@@ -197,7 +195,13 @@ public class DLIndexer extends BaseIndexer {
 			addSearchDDMStruture(searchQuery, searchContext, ddmStructure);
 		}
 
-		addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
+		String keywords = searchContext.getKeywords();
+
+		if (Validator.isNull(keywords)) {
+			addSearchTerm(searchQuery, searchContext, Field.DESCRIPTION, false);
+			addSearchTerm(searchQuery, searchContext, Field.TITLE, false);
+			addSearchTerm(searchQuery, searchContext, Field.USER_NAME, false);
+		}
 
 		addSearchTerm(searchQuery, searchContext, "extension", false);
 		addSearchTerm(searchQuery, searchContext, "fileEntryTypeId", false);
@@ -219,41 +223,26 @@ public class DLIndexer extends BaseIndexer {
 			Document document, DLFileVersion dlFileVersion)
 		throws PortalException, SystemException {
 
-		DLFileEntryType dlFileEntryType =
-			DLFileEntryTypeLocalServiceUtil.getFileEntryType(
-				dlFileVersion.getFileEntryTypeId());
+		List<DLFileEntryMetadata> dlFileEntryMetadatas =
+			DLFileEntryMetadataLocalServiceUtil.
+				getFileVersionFileEntryMetadatas(
+					dlFileVersion.getFileVersionId());
 
-		List<DDMStructure> ddmStructures = dlFileEntryType.getDDMStructures();
-
-		Group group = GroupLocalServiceUtil.getCompanyGroup(
-			dlFileVersion.getCompanyId());
-
-		DDMStructure tikaRawMetadataStructure =
-			DDMStructureLocalServiceUtil.fetchStructure(
-				group.getGroupId(), "TikaRawMetadata");
-
-		if (tikaRawMetadataStructure != null) {
-			ddmStructures = ListUtil.copy(ddmStructures);
-
-			ddmStructures.add(tikaRawMetadataStructure);
-		}
-
-		for (DDMStructure ddmStructure : ddmStructures) {
+		for (DLFileEntryMetadata dlFileEntryMetadata : dlFileEntryMetadatas) {
 			Fields fields = null;
 
 			try {
-				DLFileEntryMetadata fileEntryMetadata =
-					DLFileEntryMetadataLocalServiceUtil.getFileEntryMetadata(
-						ddmStructure.getStructureId(),
-						dlFileVersion.getFileVersionId());
-
 				fields = StorageEngineUtil.getFields(
-					fileEntryMetadata.getDDMStorageId());
+					dlFileEntryMetadata.getDDMStorageId());
 			}
 			catch (Exception e) {
 			}
 
 			if (fields != null) {
+				DDMStructure ddmStructure =
+					DDMStructureLocalServiceUtil.getStructure(
+						dlFileEntryMetadata.getDDMStructureId());
+
 				DDMIndexerUtil.addAttributes(document, ddmStructure, fields);
 			}
 		}
@@ -388,7 +377,7 @@ public class DLIndexer extends BaseIndexer {
 
 				addTrashFields(
 					document, DLFolder.class.getName(),
-					trashedFolder.getFolderId(),
+					trashedFolder.getFolderId(), null, null,
 					DLFileEntryAssetRendererFactory.TYPE);
 
 				document.addKeyword(
@@ -431,20 +420,17 @@ public class DLIndexer extends BaseIndexer {
 		catch (WindowStateException wse) {
 		}
 
-		String title = document.get(Field.TITLE);
-
-		String content = snippet;
-
-		if (Validator.isNull(snippet)) {
-			content = StringUtil.shorten(document.get(Field.CONTENT), 200);
-		}
-
 		String fileEntryId = document.get(Field.ENTRY_CLASS_PK);
 
 		portletURL.setParameter("struts_action", "/document_library/get_file");
 		portletURL.setParameter("fileEntryId", fileEntryId);
 
-		return new Summary(title, content, portletURL);
+		Summary summary = createSummary(document, Field.TITLE, Field.CONTENT);
+
+		summary.setMaxContentLength(200);
+		summary.setPortletURL(portletURL);
+
+		return summary;
 	}
 
 	@Override

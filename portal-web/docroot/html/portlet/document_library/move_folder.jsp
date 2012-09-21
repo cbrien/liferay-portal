@@ -31,6 +31,12 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", D
 
 <liferay-util:include page="/html/portlet/document_library/top_links.jsp" />
 
+<c:if test="<%= cmd.equals(Constants.MOVE_FROM_TRASH) %>">
+	<div class="portlet-msg-alert">
+		<liferay-ui:message arguments="<%= folder.getName() %>" key="the-original-folder-does-not-exist-anymore" />
+	</div>
+</c:if>
+
 <portlet:actionURL var="moveFolderURL">
 	<portlet:param name="struts_action" value="/document_library/move_folder" />
 </portlet:actionURL>
@@ -85,7 +91,7 @@ long parentFolderId = BeanParamUtil.getLong(folder, request, "parentFolderId", D
 			String taglibOpenFolderWindow = "var folderWindow = window.open('" + selectFolderURL + "','folder', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680'); void(''); folderWindow.focus();";
 			%>
 
-			<aui:button onClick='<%= taglibOpenFolderWindow %>' value="select" />
+			<aui:button onClick="<%= taglibOpenFolderWindow %>" value="select" />
 
 			<%
 			String taglibRemoveFolder = "Liferay.Util.removeFolderSelection('parentFolderId', 'parentFolderName', '" + renderResponse.getNamespace() + "');";

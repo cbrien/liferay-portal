@@ -22,11 +22,11 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class SignOutWelcomeTest extends BaseTestCase {
 	public void testSignOutWelcome() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/what-we-do/");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Sign Out", RuntimeVariables.replace("Sign Out"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isVisible("link=Sign In"));
 	}
 }

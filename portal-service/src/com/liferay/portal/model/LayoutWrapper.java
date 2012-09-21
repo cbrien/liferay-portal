@@ -1416,6 +1416,12 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 		_layout.setExpandoBridgeAttributes(serviceContext);
 	}
 
+	public void prepareLocalizedFieldsForImport(
+		java.util.Locale defaultImportLocale)
+		throws com.liferay.portal.LocaleException {
+		_layout.prepareLocalizedFieldsForImport(defaultImportLocale);
+	}
+
 	@Override
 	public java.lang.Object clone() {
 		return new LayoutWrapper((Layout)_layout.clone());
@@ -1655,6 +1661,10 @@ public class LayoutWrapper implements Layout, ModelWrapper<Layout> {
 	public boolean isSelected(boolean selectable,
 		com.liferay.portal.model.Layout layout, long ancestorPlid) {
 		return _layout.isSelected(selectable, layout, ancestorPlid);
+	}
+
+	public boolean isSupportsEmbeddedPortlets() {
+		return _layout.isSupportsEmbeddedPortlets();
 	}
 
 	public boolean isTypeArticle() {

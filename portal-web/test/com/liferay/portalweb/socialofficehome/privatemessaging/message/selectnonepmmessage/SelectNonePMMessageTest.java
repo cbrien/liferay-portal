@@ -27,30 +27,14 @@ public class SelectNonePMMessageTest extends BaseTestCase {
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/user/joebloggs/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//nav/ul/li[contains(.,'Messages')]/a/span")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//nav/ul/li[contains(.,'Messages')]/a/span");
 				selenium.clickAt("//nav/ul/li[contains(.,'Messages')]/a/span",
 					RuntimeVariables.replace("Messages"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace("Private Messaging"),
 					selenium.getText("//span[@class='portlet-title-default']"));
 				assertEquals("Mark as Unread",

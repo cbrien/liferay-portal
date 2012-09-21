@@ -286,6 +286,28 @@ public class CalEventLocalServiceUtil {
 		long userId, java.lang.String title, java.lang.String description,
 		java.lang.String location, int startDateMonth, int startDateDay,
 		int startDateYear, int startDateHour, int startDateMinute,
+		int durationHour, int durationMinute, boolean allDay,
+		boolean timeZoneSensitive, java.lang.String type, boolean repeating,
+		com.liferay.portal.kernel.cal.TZSRecurrence recurrence, int remindBy,
+		int firstReminder, int secondReminder,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .addEvent(userId, title, description, location,
+			startDateMonth, startDateDay, startDateYear, startDateHour,
+			startDateMinute, durationHour, durationMinute, allDay,
+			timeZoneSensitive, type, repeating, recurrence, remindBy,
+			firstReminder, secondReminder, serviceContext);
+	}
+
+	/**
+	* @deprecated {@link #addEvent(long, String, String, String, int, int, int, int, int, int, int, boolean, boolean, String, boolean, TZSRecurrence, int, int, int, ServiceContext)}
+	*/
+	public static com.liferay.portlet.calendar.model.CalEvent addEvent(
+		long userId, java.lang.String title, java.lang.String description,
+		java.lang.String location, int startDateMonth, int startDateDay,
+		int startDateYear, int startDateHour, int startDateMinute,
 		int endDateMonth, int endDateDay, int endDateYear, int durationHour,
 		int durationMinute, boolean allDay, boolean timeZoneSensitive,
 		java.lang.String type, boolean repeating,
@@ -366,6 +388,14 @@ public class CalEventLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return getService().exportEvent(userId, eventId);
+	}
+
+	public static java.io.File exportEvents(long userId,
+		java.util.List<com.liferay.portlet.calendar.model.CalEvent> events,
+		java.lang.String fileName)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService().exportEvents(userId, events, fileName);
 	}
 
 	public static java.io.File exportGroupEvents(long userId, long groupId,
@@ -485,6 +515,29 @@ public class CalEventLocalServiceUtil {
 			assetLinkEntryIds);
 	}
 
+	public static com.liferay.portlet.calendar.model.CalEvent updateEvent(
+		long userId, long eventId, java.lang.String title,
+		java.lang.String description, java.lang.String location,
+		int startDateMonth, int startDateDay, int startDateYear,
+		int startDateHour, int startDateMinute, int durationHour,
+		int durationMinute, boolean allDay, boolean timeZoneSensitive,
+		java.lang.String type, boolean repeating,
+		com.liferay.portal.kernel.cal.TZSRecurrence recurrence, int remindBy,
+		int firstReminder, int secondReminder,
+		com.liferay.portal.service.ServiceContext serviceContext)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .updateEvent(userId, eventId, title, description, location,
+			startDateMonth, startDateDay, startDateYear, startDateHour,
+			startDateMinute, durationHour, durationMinute, allDay,
+			timeZoneSensitive, type, repeating, recurrence, remindBy,
+			firstReminder, secondReminder, serviceContext);
+	}
+
+	/**
+	* @deprecated {@link #updateEvent(long, long, String, String, String, int, int, int, int, int, int, int, boolean, boolean, String, boolean, TZSRecurrence, int, int, int, ServiceContext)}
+	*/
 	public static com.liferay.portlet.calendar.model.CalEvent updateEvent(
 		long userId, long eventId, java.lang.String title,
 		java.lang.String description, java.lang.String location,

@@ -47,7 +47,6 @@ import com.liferay.portal.service.RepositoryLocalServiceUtil;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.persistence.RepositoryEntryUtil;
 import com.liferay.portal.service.persistence.RepositoryUtil;
-import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PortletKeys;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.documentlibrary.DuplicateFileException;
@@ -370,7 +369,9 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 					fileEntryTitle);
 
 				if (existingTitleFileEntry != null) {
-					if (portletDataContext.
+					if ((fileEntry.getGroupId() ==
+							portletDataContext.getSourceGroupId()) &&
+						portletDataContext.
 							isDataStrategyMirrorWithOverwriting()) {
 
 						DLAppLocalServiceUtil.deleteFileEntry(
@@ -425,45 +426,63 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 				FileVersion latestExistingFileVersion =
 					existingFileEntry.getLatestFileVersion();
 
-				if (!fileVersion.getUuid().equals(
-						latestExistingFileVersion.getUuid())) {
+				boolean indexEnabled = serviceContext.isIndexingEnabled();
 
-					DLFileVersion alreadyExistingFileVersion =
-						DLFileVersionLocalServiceUtil.
-							getFileVersionByUuidAndGroupId(
-								fileVersion.getUuid(),
-								existingFileEntry.getGroupId());
+				try {
+					serviceContext.setIndexingEnabled(false);
 
-					if (alreadyExistingFileVersion != null) {
-						serviceContext.setAttribute(
-							"existingDLFileVersionId",
-							alreadyExistingFileVersion.getFileVersionId());
+					if (!fileVersion.getUuid().equals(
+							latestExistingFileVersion.getUuid())) {
+
+						DLFileVersion alreadyExistingFileVersion =
+							DLFileVersionLocalServiceUtil.
+								getFileVersionByUuidAndGroupId(
+									fileVersion.getUuid(),
+									existingFileEntry.getGroupId());
+
+						if (alreadyExistingFileVersion != null) {
+							serviceContext.setAttribute(
+								"existingDLFileVersionId",
+								alreadyExistingFileVersion.getFileVersionId());
+						}
+
+						serviceContext.setUuid(fileVersion.getUuid());
+
+						importedFileEntry =
+							DLAppLocalServiceUtil.updateFileEntry(
+								userId, existingFileEntry.getFileEntryId(),
+								fileEntry.getTitle(), fileEntry.getMimeType(),
+								fileEntry.getTitle(),
+								fileEntry.getDescription(), null, false, is,
+								fileEntry.getSize(), serviceContext);
+					}
+					else {
+						DLAppLocalServiceUtil.updateAsset(
+							userId, existingFileEntry,
+							latestExistingFileVersion, assetCategoryIds,
+							assetTagNames, null);
+
+						importedFileEntry = existingFileEntry;
 					}
 
-					serviceContext.setUuid(fileVersion.getUuid());
+					if (importedFileEntry.getFolderId() != folderId) {
+						importedFileEntry = DLAppLocalServiceUtil.moveFileEntry(
+							userId, importedFileEntry.getFileEntryId(),
+							folderId, serviceContext);
+					}
 
-					importedFileEntry = DLAppLocalServiceUtil.updateFileEntry(
-						userId, existingFileEntry.getFileEntryId(),
-						fileEntry.getTitle(), fileEntry.getMimeType(),
-						fileEntry.getTitle(), fileEntry.getDescription(), null,
-						false, is, fileEntry.getSize(), serviceContext);
-				}
-				else {
-					DLAppLocalServiceUtil.updateAsset(
-						userId, existingFileEntry, latestExistingFileVersion,
-						assetCategoryIds, assetTagNames, null);
-
-					if (existingFileEntry instanceof LiferayFileEntry) {
+					if (importedFileEntry instanceof LiferayFileEntry) {
 						LiferayFileEntry liferayFileEntry =
-							(LiferayFileEntry)existingFileEntry;
+							(LiferayFileEntry)importedFileEntry;
 
 						Indexer indexer = IndexerRegistryUtil.getIndexer(
 							DLFileEntry.class);
 
 						indexer.reindex(liferayFileEntry.getModel());
 					}
-
-					importedFileEntry = existingFileEntry;
+				}
+				finally {
+					serviceContext.setIndexingEnabled(indexEnabled);
 				}
 			}
 		}
@@ -561,11 +580,10 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 		}
 
 		Repository repository =
-			(Repository)portletDataContext.getZipEntryAsObject(path);
+			(Repository)portletDataContext.getZipEntryAsObject(
+				repositoryElement, path);
 
 		long userId = portletDataContext.getUserId(repository.getUserUuid());
-		long classNameId = PortalUtil.getClassNameId(
-			repositoryElement.attributeValue("class-name"));
 
 		ServiceContext serviceContext = portletDataContext.createServiceContext(
 			repositoryElement, repository, _NAMESPACE);
@@ -583,7 +601,7 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 					importedRepositoryId =
 						RepositoryLocalServiceUtil.addRepository(
 							userId, portletDataContext.getScopeGroupId(),
-							classNameId,
+							repository.getClassNameId(),
 							DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 							repository.getName(), repository.getDescription(),
 							repository.getPortletId(),
@@ -600,7 +618,8 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 			}
 			else {
 				importedRepositoryId = RepositoryLocalServiceUtil.addRepository(
-					userId, portletDataContext.getScopeGroupId(), classNameId,
+					userId, portletDataContext.getScopeGroupId(),
+					repository.getClassNameId(),
 					DLFolderConstants.DEFAULT_PARENT_FOLDER_ID,
 					repository.getName(), repository.getDescription(),
 					repository.getPortletId(),
@@ -1088,8 +1107,6 @@ public class DLPortletDataHandlerImpl extends BasePortletDataHandler {
 
 		Element repositoryElement = repositoriesElement.addElement(
 			"repository");
-
-		repositoryElement.addAttribute("class-name", repository.getClassName());
 
 		portletDataContext.addClassedModel(
 			repositoryElement, path, repository, _NAMESPACE);

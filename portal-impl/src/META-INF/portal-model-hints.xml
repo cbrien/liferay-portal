@@ -522,7 +522,9 @@
 		<field name="minAge" type="long" />
 		<field name="checkSyntax" type="boolean" />
 		<field name="allowDictionaryWords" type="boolean" />
-		<field name="minAlphanumeric" type="int" />
+		<field name="minAlphanumeric" type="int">
+			<hint name="display-width">20</hint>
+		</field>
 		<field name="minLength" type="int">
 			<hint name="display-width">20</hint>
 		</field>
@@ -1181,7 +1183,10 @@
 		<field name="urlTitle" type="String">
 			<hint name="max-length">150</hint>
 		</field>
-		<field name="description" type="String" />
+		<field name="description" type="String">
+			<hint-collection name="TEXTAREA" />
+			<hint name="display-width">350</hint>
+		</field>
 		<field name="content" type="String">
 			<hint-collection name="CLOB" />
 			<sanitize content-type="text/html" modes="ALL" />
@@ -2567,6 +2572,10 @@
 			<hint-collection name="TEXTAREA" />
 		</field>
 		<field name="lastPostDate" type="Date" />
+		<field name="status" type="int" />
+		<field name="statusByUserId" type="long" />
+		<field name="statusByUserName" type="String" />
+		<field name="statusDate" type="Date" />
 	</model>
 	<model name="com.liferay.portlet.wiki.model.WikiPage">
 		<field name="uuid" type="String" />

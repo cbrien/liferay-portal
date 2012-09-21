@@ -39,9 +39,8 @@ import java.rmi.RemoteException;
  * </p>
  *
  * <p>
- * You can see a list of services at
- * http://localhost:8080/api/secure/axis. Set the property
- * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
+ * You can see a list of services at http://localhost:8080/api/axis. Set the
+ * property <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -2006,13 +2005,13 @@ public class DLAppServiceSoap {
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.documentlibrary.model.DLFileShortcutSoap moveFileShortcutFromTrash(
-		long fileShortcutId, long newFolderId, long toFileEntryId,
+		long fileShortcutId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws RemoteException {
 		try {
 			com.liferay.portlet.documentlibrary.model.DLFileShortcut returnValue =
 				DLAppServiceUtil.moveFileShortcutFromTrash(fileShortcutId,
-					newFolderId, toFileEntryId, serviceContext);
+					newFolderId, serviceContext);
 
 			return com.liferay.portlet.documentlibrary.model.DLFileShortcutSoap.toSoapModel(returnValue);
 		}
@@ -2204,6 +2203,10 @@ public class DLAppServiceSoap {
 		}
 	}
 
+	/**
+	* @deprecated Use {@link #checkInFileEntry(long, boolean, String,
+	ServiceContext)}.
+	*/
 	public static void unlockFileEntry(long fileEntryId)
 		throws RemoteException {
 		try {
@@ -2216,6 +2219,9 @@ public class DLAppServiceSoap {
 		}
 	}
 
+	/**
+	* @deprecated Use {@link #checkInFileEntry(long, String)}.
+	*/
 	public static void unlockFileEntry(long fileEntryId,
 		java.lang.String lockUuid) throws RemoteException {
 		try {

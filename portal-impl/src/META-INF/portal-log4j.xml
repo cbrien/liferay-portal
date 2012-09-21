@@ -302,7 +302,19 @@
 		<priority value="INFO" />
 	</category>
 
+	<category name="com.liferay.portal.kernel.lar">
+		<priority value="ERROR" />
+	</category>
+
 	<category name="com.liferay.portal.kernel.portlet.RestrictPortletServletRequest">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.process">
+		<priority value="INFO" />
+	</category>
+
+	<category name="com.liferay.portal.kernel.process.LoggingOutputProcessor">
 		<priority value="ERROR" />
 	</category>
 
@@ -399,6 +411,10 @@
 	</category>
 
 	<category name="com.liferay.portal.scheduler.quartz.PortalJobStore">
+		<priority value="ERROR" />
+	</category>
+
+	<category name="com.liferay.portal.scripting.ruby.RubyExecutor">
 		<priority value="ERROR" />
 	</category>
 

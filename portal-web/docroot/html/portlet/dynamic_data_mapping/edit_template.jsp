@@ -46,7 +46,9 @@ if (Validator.isNull(script)) {
 	if (classNameId > 0) {
 		PortletDisplayTemplateHandler portletDislayTemplateHandler = PortletDisplayTemplateHandlerRegistryUtil.getPortletDisplayTemplateHandler(classNameId);
 
-		script = ContentUtil.get(portletDislayTemplateHandler.getDefaultTemplateLocation());
+		if (portletDislayTemplateHandler != null) {
+			script = ContentUtil.get(portletDislayTemplateHandler.getHelpTemplatePath());
+		}
 	}
 	else if (!type.equals("detail")) {
 		script = ContentUtil.get(PropsUtil.get(PropsKeys.DYNAMIC_DATA_MAPPING_TEMPLATE_LANGUAGE_CONTENT, new Filter(DDMTemplateConstants.LANG_TYPE_VM)));
@@ -126,6 +128,23 @@ if (Validator.isNotNull(structureAvailableFields)) {
 		<liferay-ui:panel-container cssClass="lfr-structure-entry-details-container" extended="<%= false %>" id="templateDetailsPanelContainer" persistState="<%= true %>">
 			<liferay-ui:panel collapsible="<%= true %>" extended="<%= false %>" id="templateDetailsSectionPanel" persistState="<%= true %>" title="details">
 				<aui:input name="description" />
+
+				<c:if test="<%= template != null %>">
+					<aui:field-wrapper label="url">
+						<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathMain() + "/dynamic_data_mapping/get_template?templateId=" + templateId %>' />
+					</aui:field-wrapper>
+
+					<c:if test="<%= portletDisplay.isWebDAVEnabled() %>">
+						<aui:field-wrapper label="webdav-url">
+
+							<%
+							Group group = GroupLocalServiceUtil.getGroup(groupId);
+							%>
+
+							<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/webdav" + group.getFriendlyURL() + "/dynamic_data_mapping/ddmTemplates/" + templateId %>' />
+						</aui:field-wrapper>
+					</c:if>
+				</c:if>
 
 				<c:if test='<%= type.equals("detail") %>'>
 					<aui:select helpMessage="only-allow-deleting-required-fields-in-edit-mode" label="mode" name="mode">

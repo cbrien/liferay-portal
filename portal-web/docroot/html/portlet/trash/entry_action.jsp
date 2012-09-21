@@ -19,40 +19,25 @@
 <%
 SearchContainer searchContainer = (SearchContainer)request.getAttribute("liferay-ui:search:searchContainer");
 
-String redirect = searchContainer.getIteratorURL().toString();
+String redirect = ParamUtil.getString(request, "redirect");
+
+if (searchContainer != null) {
+	redirect = searchContainer.getIteratorURL().toString();
+}
 
 ResultRow row = (ResultRow)request.getAttribute(WebKeys.SEARCH_CONTAINER_RESULT_ROW);
 
-TrashEntry entry = (TrashEntry)row.getObject();
+TrashEntry entry = null;
+
+if (row != null) {
+	entry = (TrashEntry)row.getObject();
+}
+else {
+	entry = (TrashEntry)request.getAttribute(WebKeys.TRASH_ENTRY);
+}
 %>
 
 <liferay-ui:icon-menu>
-	<portlet:actionURL var="restoreEntryURL">
-		<portlet:param name="struts_action" value="/trash/edit_entry" />
-		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
-		<portlet:param name="redirect" value="<%= redirect %>" />
-		<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
-	</portlet:actionURL>
-
-	<%
-	String taglibOnClick = "Liferay.fire('" + renderResponse.getNamespace() + "checkEntry', {entryId: " + entry.getEntryId() + ", uri: '" + restoreEntryURL.toString() + "'});";
-	%>
-
-	<liferay-ui:icon
-		image="undo"
-		message="restore"
-		onClick="<%= taglibOnClick %>"
-		url="javascript:;"
-	/>
-
-	<portlet:actionURL var="deleteEntryURL">
-		<portlet:param name="struts_action" value="/trash/edit_entry" />
-		<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.DELETE %>" />
-		<portlet:param name="redirect" value="<%= redirect %>" />
-		<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
-	</portlet:actionURL>
-
-	<liferay-ui:icon-delete
-		url="<%= deleteEntryURL %>"
-	/>
+	<%@ include file="/html/portlet/trash/action/restore.jspf" %>
+	<%@ include file="/html/portlet/trash/action/delete.jspf" %>
 </liferay-ui:icon-menu>

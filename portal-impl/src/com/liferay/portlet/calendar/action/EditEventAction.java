@@ -42,6 +42,7 @@ import com.liferay.portlet.calendar.EventStartDateException;
 import com.liferay.portlet.calendar.EventTitleException;
 import com.liferay.portlet.calendar.NoSuchEventException;
 import com.liferay.portlet.calendar.model.CalEvent;
+import com.liferay.portlet.calendar.model.CalEventConstants;
 import com.liferay.portlet.calendar.service.CalEventServiceUtil;
 
 import java.util.ArrayList;
@@ -381,13 +382,13 @@ public class EditEventAction extends PortletAction {
 			int endDateType = ParamUtil.getInteger(
 				actionRequest, "endDateType");
 
-			if (endDateType == 1) {
+			if (endDateType == CalEventConstants.END_DATE_TYPE_END_AFTER) {
 				int endDateOccurrence = ParamUtil.getInteger(
 					actionRequest, "endDateOccurrence");
 
 				recurrence.setOccurrence(endDateOccurrence);
 			}
-			else if (endDateType == 2) {
+			else if (endDateType == CalEventConstants.END_DATE_TYPE_END_BY) {
 				Calendar endDate = CalendarFactoryUtil.getCalendar(timeZone);
 
 				endDate.set(Calendar.MONTH, endDateMonth);
@@ -429,10 +430,10 @@ public class EditEventAction extends PortletAction {
 
 			CalEvent event = CalEventServiceUtil.addEvent(
 				title, description, location, startDateMonth, startDateDay,
-				startDateYear, startDateHour, startDateMinute, endDateMonth,
-				endDateDay, endDateYear, durationHour, durationMinute, allDay,
-				timeZoneSensitive, type, repeating, recurrence, remindBy,
-				firstReminder, secondReminder, serviceContext);
+				startDateYear, startDateHour, startDateMinute, durationHour,
+				durationMinute, allDay, timeZoneSensitive, type, repeating,
+				recurrence, remindBy, firstReminder, secondReminder,
+				serviceContext);
 
 			AssetPublisherUtil.addAndStoreSelection(
 				actionRequest, CalEvent.class.getName(), event.getEventId(),
@@ -445,9 +446,8 @@ public class EditEventAction extends PortletAction {
 			CalEventServiceUtil.updateEvent(
 				eventId, title, description, location, startDateMonth,
 				startDateDay, startDateYear, startDateHour, startDateMinute,
-				endDateMonth, endDateDay, endDateYear, durationHour,
-				durationMinute, allDay, timeZoneSensitive, type, repeating,
-				recurrence, remindBy, firstReminder, secondReminder,
+				durationHour, durationMinute, allDay, timeZoneSensitive, type,
+				repeating, recurrence, remindBy, firstReminder, secondReminder,
 				serviceContext);
 		}
 	}

@@ -152,18 +152,27 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 				List<Role> roles = RoleLocalServiceUtil.getUserRelatedRoles(
 					defaultUserId, groups);
 
+				// Only use the guest group for deriving the roles for
+				// unauthenticated users. Do not add the group to the permission
+				// bag as this implies group membership which is incorrect in
+				// the case of unauthenticated users.
+
 				bag = new PermissionCheckerBagImpl(
-					defaultUserId, new ArrayList<Group>(),
-					new ArrayList<Organization>(), new ArrayList<Group>(),
-					new ArrayList<Group>(), groups, roles);
+					defaultUserId, Collections.<Group>emptyList(),
+					Collections.<Organization>emptyList(),
+					Collections.<Group>emptyList(),
+					Collections.<Group>emptyList(),
+					Collections.<Group>emptyList(), roles);
 			}
 			finally {
 				if (bag == null) {
 					bag = new PermissionCheckerBagImpl(
-						defaultUserId, new ArrayList<Group>(),
-						new ArrayList<Organization>(), new ArrayList<Group>(),
-						new ArrayList<Group>(), new ArrayList<Group>(),
-						new ArrayList<Role>());
+						defaultUserId, Collections.<Group>emptyList(),
+						Collections.<Organization>emptyList(),
+						Collections.<Group>emptyList(),
+						Collections.<Group>emptyList(),
+						Collections.<Group>emptyList(),
+						Collections.<Role>emptyList());
 				}
 
 				PermissionCacheUtil.putBag(
@@ -407,9 +416,10 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 					roles.add(organizationUserRole);
 				}
 
-				if (group.isSite() &&
-					(userGroups.contains(group) ||
-					 userOrgGroups.contains(group))) {
+				if ((group.isSite() &&
+					 (userGroups.contains(group) ||
+						userOrgGroups.contains(group))) ||
+					group.isUserPersonalSite()) {
 
 					Role siteMemberRole = RoleLocalServiceUtil.getRole(
 						group.getCompanyId(), RoleConstants.SITE_MEMBER);
@@ -434,10 +444,12 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		finally {
 			if (bag == null) {
 				bag = new PermissionCheckerBagImpl(
-					userId, new ArrayList<Group>(),
-					new ArrayList<Organization>(), new ArrayList<Group>(),
-					new ArrayList<Group>(), new ArrayList<Group>(),
-					new ArrayList<Role>());
+					userId, Collections.<Group>emptyList(),
+					Collections.<Organization>emptyList(),
+					Collections.<Group>emptyList(),
+					Collections.<Group>emptyList(),
+					Collections.<Group>emptyList(),
+					Collections.<Role>emptyList());
 			}
 
 			PermissionCacheUtil.putBag(userId, groupId, bag);
@@ -904,7 +916,7 @@ public class AdvancedPermissionChecker extends BasePermissionChecker {
 		// current portlet
 
 		if (Validator.isNotNull(name) && Validator.isNotNull(primKey) &&
-			(primKey.indexOf(PortletConstants.LAYOUT_SEPARATOR) != -1)) {
+			primKey.contains(PortletConstants.LAYOUT_SEPARATOR)) {
 
 			hasLayoutManagerPermission =
 				PortletPermissionUtil.hasLayoutManagerPermission(

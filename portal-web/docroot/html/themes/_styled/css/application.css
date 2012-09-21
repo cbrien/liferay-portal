@@ -22,6 +22,10 @@
 	border-width: 0 1px;
 }
 
+.context-pane-content .results-grid {
+	border-width: 0;
+}
+
 .results-header {
 	background: #D1D6DC;
 
@@ -164,7 +168,6 @@
 	opacity: 0.65;
 	position: absolute;
 
-
 	&.generic-portlet {
 		height: 200px;
 		width: 300px;
@@ -293,7 +296,6 @@
 	text-decoration: none;
 }
 
-
 .tag-cloud {
 	line-height: 2.5em;
 
@@ -390,6 +392,11 @@
 	border-color: #C8C9CA #AEB2B8 #AEB2B8 #C8C9CA;
 	padding-left: 10px;
 	text-shadow: 1px 1px #FFF;
+}
+
+.app-view-drop-active {
+	background-color: #00A2EA;
+	font-weight: bold;
 }
 
 /* ---------- Menus ---------- */

@@ -29,6 +29,7 @@ import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Query;
 import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.SearchException;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.FileUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.OrderByComparator;
@@ -40,7 +41,6 @@ import com.liferay.portal.model.Lock;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
 import com.liferay.portal.security.permission.ActionKeys;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.spring.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portlet.documentlibrary.NoSuchFileEntryException;
 import com.liferay.portlet.documentlibrary.model.DLFileShortcut;
 import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
@@ -1956,21 +1956,31 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		return TempFileUtil.getTempFileEntryNames(getUserId(), tempFolderName);
 	}
 
+	/**
+	 * @deprecated {@link #checkOutFileEntry(long, ServiceContext)}
+	 */
 	public Lock lockFileEntry(long fileEntryId)
 		throws PortalException, SystemException {
 
-		Repository repository = getRepository(0, fileEntryId, 0);
+		checkOutFileEntry(fileEntryId, new ServiceContext());
 
-		return repository.lockFileEntry(fileEntryId);
+		FileEntry fileEntry = getFileEntry(fileEntryId);
+
+		return fileEntry.getLock();
 	}
 
+	/**
+	 * @deprecated {@link #checkOutFileEntry(long, String, long,
+	 *             ServiceContext)}
+	 */
 	public Lock lockFileEntry(
 			long fileEntryId, String owner, long expirationTime)
 		throws PortalException, SystemException {
 
-		Repository repository = getRepository(0, fileEntryId, 0);
+		FileEntry fileEntry = checkOutFileEntry(
+			fileEntryId, owner, expirationTime, new ServiceContext());
 
-		return repository.lockFileEntry(fileEntryId, owner, expirationTime);
+		return fileEntry.getLock();
 	}
 
 	/**
@@ -2131,7 +2141,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 	 * @throws SystemException if a system exception occurred
 	 */
 	public DLFileShortcut moveFileShortcutFromTrash(
-			long fileShortcutId, long newFolderId, long toFileEntryId,
+			long fileShortcutId, long newFolderId,
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
@@ -2141,8 +2151,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			getPermissionChecker(), fileShortcut, ActionKeys.UPDATE);
 
 		return dlAppHelperLocalService.moveFileShortcutFromTrash(
-			getUserId(), fileShortcut, newFolderId, toFileEntryId,
-			serviceContext);
+			getUserId(), fileShortcut, newFolderId, serviceContext);
 	}
 
 	/**
@@ -2446,20 +2455,24 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 		}
 	}
 
+	/**
+	 * @deprecated Use {@link #checkInFileEntry(long, boolean, String,
+	 *             ServiceContext)}.
+	 */
 	public void unlockFileEntry(long fileEntryId)
 		throws PortalException, SystemException {
 
-		Repository repository = getRepository(0, fileEntryId, 0);
-
-		repository.unlockFileEntry(fileEntryId);
+		checkInFileEntry(
+			fileEntryId, false, StringPool.BLANK, new ServiceContext());
 	}
 
+	/**
+	 * @deprecated Use {@link #checkInFileEntry(long, String)}.
+	 */
 	public void unlockFileEntry(long fileEntryId, String lockUuid)
 		throws PortalException, SystemException {
 
-		Repository repository = getRepository(0, fileEntryId, 0);
-
-		repository.unlockFileEntry(fileEntryId, lockUuid);
+		checkInFileEntry(fileEntryId, lockUuid);
 	}
 
 	/**
@@ -2979,7 +2992,7 @@ public class DLAppServiceImpl extends DLAppServiceBaseImpl {
 			}
 		}
 
-		TransactionCommitCallbackUtil.registerCallback(
+		TransactionCommitCallbackRegistryUtil.registerCallback(
 			new Callable<Void>() {
 
 				public Void call() throws Exception {

@@ -24,55 +24,23 @@ public class ViewImportExportLARPublicPagesSiteLARImportSiteTest
 	extends BaseTestCase {
 	public void testViewImportExportLARPublicPagesSiteLARImportSite()
 		throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Go to"),
 			selenium.getText("//ul[contains(.,'Go to')]/li/a"));
 		Thread.sleep(5000);
 		selenium.clickAt("//ul[contains(.,'Go to')]/li/a",
 			RuntimeVariables.replace("Go to"));
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible(
-							"//li[contains(.,'LAR Import Site')]/a/span[contains(.,'Public')]")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible(
+			"//li[contains(.,'LAR Import Site')]/a/span[contains(.,'Public')]");
 		assertEquals(RuntimeVariables.replace("Public"),
 			selenium.getText(
 				"//li[contains(.,'LAR Import Site')]/a/span[contains(.,'Public')]"));
 		selenium.clickAt("//li[contains(.,'LAR Import Site')]/a/span[contains(.,'Public')]",
 			RuntimeVariables.replace("Public"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("//a[@class='logo custom-logo']")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("//a[@class='logo custom-logo']");
 		assertTrue(selenium.isVisible("//a[@class='logo custom-logo']"));
 		assertTrue(selenium.isElementPresent("//img[@height='156']"));
 		assertTrue(selenium.isElementPresent("//img[@width='320']"));
@@ -85,7 +53,6 @@ public class ViewImportExportLARPublicPagesSiteLARImportSiteTest
 		assertTrue(selenium.isVisible("link=Home"));
 		selenium.clickAt("link=Home", RuntimeVariables.replace("Home"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Home"),
 			selenium.getText("//nav/ul/li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Welcome to Brazil"),
@@ -93,7 +60,6 @@ public class ViewImportExportLARPublicPagesSiteLARImportSiteTest
 		assertTrue(selenium.isVisible("link=Arenas"));
 		selenium.clickAt("link=Arenas", RuntimeVariables.replace("Arenas"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//nav/ul/li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Welcome to Brazil"),
@@ -103,7 +69,6 @@ public class ViewImportExportLARPublicPagesSiteLARImportSiteTest
 		selenium.clickAt("link=Arena Pernambuco",
 			RuntimeVariables.replace("Arena Pernambuco"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//nav/ul/li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Arena Pernambuco"),
@@ -115,7 +80,6 @@ public class ViewImportExportLARPublicPagesSiteLARImportSiteTest
 		selenium.clickAt("link=Arena da Baixada",
 			RuntimeVariables.replace("Arena da Baixada"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//nav/ul/li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Arena da Baixada"),
@@ -126,7 +90,6 @@ public class ViewImportExportLARPublicPagesSiteLARImportSiteTest
 		assertTrue(selenium.isVisible("link=Maracana"));
 		selenium.clickAt("link=Maracana", RuntimeVariables.replace("Maracana"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//nav/ul/li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Maracana"),

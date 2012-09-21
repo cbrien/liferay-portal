@@ -22,29 +22,15 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class Guest_ViewPublicPagesSiteBWCTest extends BaseTestCase {
 	public void testGuest_ViewPublicPagesSiteBWC() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.openWindow("http://www.able.com:8080",
 			RuntimeVariables.replace("home"));
 		selenium.waitForPopUp("home", RuntimeVariables.replace(""));
 		selenium.selectWindow("home");
 		Thread.sleep(5000);
 		Thread.sleep(5000);
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("//a[@class='logo custom-logo']")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("//a[@class='logo custom-logo']");
 		assertTrue(selenium.isVisible("//a[@class='logo custom-logo']"));
 		assertTrue(selenium.isElementPresent("//img[@height='156']"));
 		assertTrue(selenium.isElementPresent("//img[@width='320']"));
@@ -57,7 +43,6 @@ public class Guest_ViewPublicPagesSiteBWCTest extends BaseTestCase {
 		assertTrue(selenium.isVisible("link=Home"));
 		selenium.clickAt("link=Home", RuntimeVariables.replace("Home"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Home"),
 			selenium.getText("//li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Welcome to Brazil"),
@@ -65,7 +50,6 @@ public class Guest_ViewPublicPagesSiteBWCTest extends BaseTestCase {
 		assertTrue(selenium.isVisible("link=Arenas"));
 		selenium.clickAt("link=Arenas", RuntimeVariables.replace("Arenas"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Welcome to Brazil"),
@@ -75,7 +59,6 @@ public class Guest_ViewPublicPagesSiteBWCTest extends BaseTestCase {
 		selenium.clickAt("link=Arena Pernambuco",
 			RuntimeVariables.replace("Arena Pernambuco"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Arena Pernambuco"),
@@ -87,7 +70,6 @@ public class Guest_ViewPublicPagesSiteBWCTest extends BaseTestCase {
 		selenium.clickAt("link=Arena da Baixada",
 			RuntimeVariables.replace("Arena da Baixada"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Arena da Baixada"),
@@ -98,7 +80,6 @@ public class Guest_ViewPublicPagesSiteBWCTest extends BaseTestCase {
 		assertTrue(selenium.isVisible("link=Maracana"));
 		selenium.clickAt("link=Maracana", RuntimeVariables.replace("Maracana"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Arenas"),
 			selenium.getText("//li[3]/span/a"));
 		assertEquals(RuntimeVariables.replace("Maracana"),

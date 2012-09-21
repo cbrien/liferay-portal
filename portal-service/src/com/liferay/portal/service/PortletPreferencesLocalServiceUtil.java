@@ -290,6 +290,11 @@ public class PortletPreferencesLocalServiceUtil {
 			.deletePortletPreferences(ownerId, ownerType, plid, portletId);
 	}
 
+	public static void deletePortletPreferencesByPlid(long plid)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		getService().deletePortletPreferencesByPlid(plid);
+	}
+
 	public static javax.portlet.PortletPreferences getDefaultPreferences(
 		long companyId, java.lang.String portletId)
 		throws com.liferay.portal.kernel.exception.SystemException {
@@ -339,6 +344,13 @@ public class PortletPreferencesLocalServiceUtil {
 	public static java.util.List<com.liferay.portal.model.PortletPreferences> getPortletPreferencesByPlid(
 		long plid) throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getPortletPreferencesByPlid(plid);
+	}
+
+	public static long getPortletPreferencesCount(int ownerType, long plid,
+		java.lang.String portletId)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .getPortletPreferencesCount(ownerType, plid, portletId);
 	}
 
 	public static javax.portlet.PortletPreferences getPreferences(

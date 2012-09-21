@@ -783,6 +783,12 @@ public class DDMTemplateWrapper implements DDMTemplate,
 		_ddmTemplate.setExpandoBridgeAttributes(serviceContext);
 	}
 
+	public void prepareLocalizedFieldsForImport(
+		java.util.Locale defaultImportLocale)
+		throws com.liferay.portal.LocaleException {
+		_ddmTemplate.prepareLocalizedFieldsForImport(defaultImportLocale);
+	}
+
 	@Override
 	public java.lang.Object clone() {
 		return new DDMTemplateWrapper((DDMTemplate)_ddmTemplate.clone());
@@ -818,6 +824,10 @@ public class DDMTemplateWrapper implements DDMTemplate,
 	public void persist()
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_ddmTemplate.persist();
+	}
+
+	public java.lang.String getDefaultLanguageId() {
+		return _ddmTemplate.getDefaultLanguageId();
 	}
 
 	/**

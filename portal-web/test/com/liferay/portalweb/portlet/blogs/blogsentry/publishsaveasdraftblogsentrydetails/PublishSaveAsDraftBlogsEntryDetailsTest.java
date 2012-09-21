@@ -23,29 +23,13 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class PublishSaveAsDraftBlogsEntryDetailsTest extends BaseTestCase {
 	public void testPublishSaveAsDraftBlogsEntryDetails()
 		throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Blogs Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Blogs Test Page");
 		selenium.clickAt("link=Blogs Test Page",
 			RuntimeVariables.replace("Blogs Test Page"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Draft"),
 			selenium.getText("//div[@class='entry-content']/h3"));
 		assertEquals(RuntimeVariables.replace("Blogs Entry Title"),
@@ -56,12 +40,10 @@ public class PublishSaveAsDraftBlogsEntryDetailsTest extends BaseTestCase {
 			selenium.getText("//span/a/span"));
 		selenium.click(RuntimeVariables.replace("//span/a/span"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		Thread.sleep(5000);
 		selenium.clickAt("//input[@value='Publish']",
 			RuntimeVariables.replace("Publish"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"Your request completed successfully."),
 			selenium.getText("//div[@class='portlet-msg-success']"));

@@ -625,7 +625,7 @@ public class UserServiceWrapper implements UserService,
 	* @param screenName the user's screen name
 	* @return the user with the screen name
 	* @throws PortalException if a user with the screen name could not be found
-	or if the current user did not have permission to veiw the user
+	or if the current user did not have permission to view the user
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portal.model.User getUserByScreenName(long companyId,
@@ -682,6 +682,8 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @return <code>true</code> if the user is a member of the group;
 	<code>false</code> otherwise
+	* @throws PortalException if the current user did not have permission to
+	view the user or group members
 	* @throws SystemException if a system exception occurred
 	*/
 	public boolean hasGroupUser(long groupId, long userId)
@@ -697,6 +699,8 @@ public class UserServiceWrapper implements UserService,
 	* @param userId the primary key of the user
 	* @return <code>true</code> if the user is a member of the role;
 	<code>false</code> otherwise
+	* @throws PortalException if the current user did not have permission to
+	view the user or role members
 	* @throws SystemException if a system exception occurred
 	*/
 	public boolean hasRoleUser(long roleId, long userId)
@@ -757,6 +761,21 @@ public class UserServiceWrapper implements UserService,
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		_userService.setUserGroupUsers(userGroupId, userIds);
+	}
+
+	/**
+	* Removes the users from the teams of a group.
+	*
+	* @param groupId the primary key of the group
+	* @param userIds the primary keys of the users
+	* @throws PortalException if the current user did not have permission to
+	modify user group assignments
+	* @throws SystemException if a system exception occurred
+	*/
+	public void unsetGroupTeamsUsers(long groupId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_userService.unsetGroupTeamsUsers(groupId, userIds);
 	}
 
 	/**

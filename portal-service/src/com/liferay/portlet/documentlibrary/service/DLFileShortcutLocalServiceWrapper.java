@@ -343,6 +343,20 @@ public class DLFileShortcutLocalServiceWrapper
 		_dlFileShortcutLocalService.deleteFileShortcuts(toFileEntryId);
 	}
 
+	public void deleteFileShortcuts(long groupId, long folderId)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileShortcutLocalService.deleteFileShortcuts(groupId, folderId);
+	}
+
+	public void deleteFileShortcuts(long groupId, long folderId,
+		boolean includeTrashedEntries)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		_dlFileShortcutLocalService.deleteFileShortcuts(groupId, folderId,
+			includeTrashedEntries);
+	}
+
 	public void disableFileShortcuts(long toFileEntryId)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		_dlFileShortcutLocalService.disableFileShortcuts(toFileEntryId);
@@ -358,6 +372,20 @@ public class DLFileShortcutLocalServiceWrapper
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		return _dlFileShortcutLocalService.getFileShortcut(fileShortcutId);
+	}
+
+	public java.util.List<com.liferay.portlet.documentlibrary.model.DLFileShortcut> getFileShortcuts(
+		long groupId, long folderId, boolean active, int status, int start,
+		int end) throws com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileShortcutLocalService.getFileShortcuts(groupId, folderId,
+			active, status, start, end);
+	}
+
+	public int getFileShortcutsCount(long groupId, long folderId,
+		boolean active, int status)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return _dlFileShortcutLocalService.getFileShortcutsCount(groupId,
+			folderId, active, status);
 	}
 
 	public void updateAsset(long userId,

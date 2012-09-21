@@ -29,29 +29,13 @@ public class User_RenameMainPageVariationRegularSPSeasonTest
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Site Name")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent("link=Site Name");
 				selenium.clickAt("link=Site Name",
 					RuntimeVariables.replace("Site Name"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'live-view')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -62,7 +46,6 @@ public class User_RenameMainPageVariationRegularSPSeasonTest
 				selenium.clickAt("//div[@class='staging-bar']/ul/li[2]/span/a",
 					RuntimeVariables.replace("Staging"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'local-staging')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -79,7 +62,6 @@ public class User_RenameMainPageVariationRegularSPSeasonTest
 				selenium.clickAt("link=Season",
 					RuntimeVariables.replace("Season"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 			case 2:
 				assertEquals(RuntimeVariables.replace(
@@ -100,75 +82,24 @@ public class User_RenameMainPageVariationRegularSPSeasonTest
 					selenium.getText("//td[3]/span/a/span"));
 				selenium.clickAt("//td[3]/span/a/span",
 					RuntimeVariables.replace("Edit"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("//input[@id='_170_name']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("//input[@id='_170_name']");
 				selenium.type("//input[@id='_170_name']",
 					RuntimeVariables.replace("Regular"));
 				selenium.type("//textarea[@id='_170_description']",
 					RuntimeVariables.replace("Regular Description"));
 				selenium.clickAt("//input[@value='Update']",
 					RuntimeVariables.replace("Update"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//div[@class='portlet-msg-success']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("//div[@class='portlet-msg-success']");
 				assertEquals(RuntimeVariables.replace(
 						"Page variation was updated."),
 					selenium.getText("//div[@class='portlet-msg-success']"));
 				assertTrue(selenium.isPartialText("//td[1]/strong", "Regular"));
 				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Site Name")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent("link=Site Name");
 				selenium.clickAt("link=Site Name",
 					RuntimeVariables.replace("Site Name"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'live-view')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -179,7 +110,6 @@ public class User_RenameMainPageVariationRegularSPSeasonTest
 				selenium.clickAt("//div[@class='staging-bar']/ul/li[2]/span/a",
 					RuntimeVariables.replace("Staging"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'local-staging')]"));
 				assertTrue(selenium.isElementNotPresent(

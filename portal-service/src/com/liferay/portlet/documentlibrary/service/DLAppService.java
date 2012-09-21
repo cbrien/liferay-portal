@@ -20,6 +20,7 @@ import com.liferay.portal.kernel.jsonwebservice.JSONWebService;
 import com.liferay.portal.kernel.transaction.Isolation;
 import com.liferay.portal.kernel.transaction.Propagation;
 import com.liferay.portal.kernel.transaction.Transactional;
+import com.liferay.portal.security.ac.AccessControlled;
 import com.liferay.portal.service.BaseService;
 
 /**
@@ -35,6 +36,7 @@ import com.liferay.portal.service.BaseService;
  * @see com.liferay.portlet.documentlibrary.service.impl.DLAppServiceImpl
  * @generated
  */
+@AccessControlled
 @JSONWebService
 @Transactional(isolation = Isolation.PORTAL, rollbackFor =  {
 	PortalException.class, SystemException.class})
@@ -1558,10 +1560,17 @@ public interface DLAppService extends BaseService {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated {@link #checkOutFileEntry(long, ServiceContext)}
+	*/
 	public com.liferay.portal.model.Lock lockFileEntry(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated {@link #checkOutFileEntry(long, String, long,
+	ServiceContext)}
+	*/
 	public com.liferay.portal.model.Lock lockFileEntry(long fileEntryId,
 		java.lang.String owner, long expirationTime)
 		throws com.liferay.portal.kernel.exception.PortalException,
@@ -1660,7 +1669,7 @@ public interface DLAppService extends BaseService {
 	* @throws SystemException if a system exception occurred
 	*/
 	public com.liferay.portlet.documentlibrary.model.DLFileShortcut moveFileShortcutFromTrash(
-		long fileShortcutId, long newFolderId, long toFileEntryId,
+		long fileShortcutId, long newFolderId,
 		com.liferay.portal.service.ServiceContext serviceContext)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
@@ -1818,10 +1827,17 @@ public interface DLAppService extends BaseService {
 		com.liferay.portal.kernel.search.Query query)
 		throws com.liferay.portal.kernel.search.SearchException;
 
+	/**
+	* @deprecated Use {@link #checkInFileEntry(long, boolean, String,
+	ServiceContext)}.
+	*/
 	public void unlockFileEntry(long fileEntryId)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 
+	/**
+	* @deprecated Use {@link #checkInFileEntry(long, String)}.
+	*/
 	public void unlockFileEntry(long fileEntryId, java.lang.String lockUuid)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;

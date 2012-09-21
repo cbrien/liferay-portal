@@ -91,7 +91,16 @@ if (Validator.isNotNull(toLanguageId)) {
 }
 
 if ((article == null) && Validator.isNull(defaultLanguageId)) {
-	defaultLanguageId = languageId;
+	Locale[] availableLocales = LanguageUtil.getAvailableLocales();
+
+	Locale defaultContentLocale = LocaleUtil.fromLanguageId(languageId);
+
+	if (ArrayUtil.contains(availableLocales, defaultContentLocale)) {
+		defaultLanguageId = languageId;
+	}
+	else {
+		defaultLanguageId = LocaleUtil.toLanguageId(LocaleUtil.getDefault());
+	}
 }
 else {
 	if (Validator.isNull(defaultLanguageId)) {
@@ -154,13 +163,12 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 	<aui:input name="classNameId" type="hidden" value="<%= classNameId %>" />
 	<aui:input name="classPK" type="hidden" value="<%= classPK %>" />
 	<aui:input name="articleId" type="hidden" value="<%= articleId %>" />
+	<aui:input name="articleIds" type="hidden" value="<%= articleId + EditArticleAction.VERSION_SEPARATOR + version %>" />
 	<aui:input name="version" type="hidden" value="<%= ((article == null) || article.isNew()) ? version : article.getVersion() %>" />
 	<aui:input name="languageId" type="hidden" value="<%= languageId %>" />
 	<aui:input id="articleContent" name="content" type="hidden" />
 	<aui:input name="articleURL" type="hidden" value="<%= editArticleRenderURL %>" />
 	<aui:input name="workflowAction" type="hidden" value="<%= String.valueOf(WorkflowConstants.ACTION_SAVE_DRAFT) %>" />
-	<aui:input name="deleteArticleIds" type="hidden" value="<%= articleId + EditArticleAction.VERSION_SEPARATOR + version %>" />
-	<aui:input name="expireArticleIds" type="hidden" value="<%= articleId + EditArticleAction.VERSION_SEPARATOR + version %>" />
 
 	<liferay-ui:error exception="<%= ArticleContentSizeException.class %>" message="you-have-exceeded-the-maximum-article-content-size-allowed" />
 
@@ -387,8 +395,6 @@ request.setAttribute("edit_article.jsp-toLanguageId", toLanguageId);
 </aui:script>
 
 <%!
-private static String[] _CATEGORY_NAMES = {""};
-
 private String _getArticleImage(ThemeDisplay themeDisplay, JournalArticle article) {
 	String imageURL = null;
 
@@ -407,4 +413,6 @@ private String _getArticleImage(ThemeDisplay themeDisplay, JournalArticle articl
 private String _getSectionJsp(String name) {
 	return TextFormatter.format(name, TextFormatter.N);
 }
+
+private static final String[] _CATEGORY_NAMES = {""};
 %>

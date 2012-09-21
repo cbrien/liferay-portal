@@ -49,9 +49,8 @@ import java.rmi.RemoteException;
  * </p>
  *
  * <p>
- * You can see a list of services at
- * http://localhost:8080/api/secure/axis. Set the property
- * <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
+ * You can see a list of services at http://localhost:8080/api/axis. Set the
+ * property <b>axis.servlet.hosts.allowed</b> in portal.properties to configure
  * security.
  * </p>
  *
@@ -169,12 +168,10 @@ public class WikiPageServiceSoap {
 		}
 	}
 
-	public static void deleteTempPageAttachment(long nodeId,
-		java.lang.String fileName, java.lang.String tempFolderName)
+	public static void deletePageAttachments(long nodeId, java.lang.String title)
 		throws RemoteException {
 		try {
-			WikiPageServiceUtil.deleteTempPageAttachment(nodeId, fileName,
-				tempFolderName);
+			WikiPageServiceUtil.deletePageAttachments(nodeId, title);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -183,10 +180,12 @@ public class WikiPageServiceSoap {
 		}
 	}
 
-	public static void emptyPageAttachments(long nodeId, java.lang.String title)
+	public static void deleteTempPageAttachment(long nodeId,
+		java.lang.String fileName, java.lang.String tempFolderName)
 		throws RemoteException {
 		try {
-			WikiPageServiceUtil.emptyPageAttachments(nodeId, title);
+			WikiPageServiceUtil.deleteTempPageAttachment(nodeId, fileName,
+				tempFolderName);
 		}
 		catch (Exception e) {
 			_log.error(e, e);
@@ -350,12 +349,50 @@ public class WikiPageServiceSoap {
 		}
 	}
 
-	public static void movePageAttachmentToTrash(long nodeId,
+	public static java.lang.String movePageAttachmentToTrash(long nodeId,
 		java.lang.String title, java.lang.String fileName)
 		throws RemoteException {
 		try {
-			WikiPageServiceUtil.movePageAttachmentToTrash(nodeId, title,
-				fileName);
+			java.lang.String returnValue = WikiPageServiceUtil.movePageAttachmentToTrash(nodeId,
+					title, fileName);
+
+			return returnValue;
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void movePageToTrash(long nodeId, java.lang.String title)
+		throws RemoteException {
+		try {
+			WikiPageServiceUtil.movePageToTrash(nodeId, title);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void movePageToTrash(long nodeId, java.lang.String title,
+		double version) throws RemoteException {
+		try {
+			WikiPageServiceUtil.movePageToTrash(nodeId, title, version);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+
+			throw new RemoteException(e.getMessage());
+		}
+	}
+
+	public static void restorePageFromTrash(long resourcePrimKey)
+		throws RemoteException {
+		try {
+			WikiPageServiceUtil.restorePageFromTrash(resourcePrimKey);
 		}
 		catch (Exception e) {
 			_log.error(e, e);

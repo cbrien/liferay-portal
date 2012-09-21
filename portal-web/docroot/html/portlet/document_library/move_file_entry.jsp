@@ -74,6 +74,12 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 	</c:choose>
 </c:if>
 
+<c:if test="<%= cmd.equals(Constants.MOVE_FROM_TRASH) %>">
+	<div class="portlet-msg-alert">
+		<liferay-ui:message arguments="<%= fileEntry.getTitle() %>" key="the-original-folder-does-not-exist-anymore" />
+	</div>
+</c:if>
+
 <portlet:actionURL var="moveFileEntryURL">
 	<portlet:param name="struts_action" value="/document_library/move_file_entry" />
 </portlet:actionURL>
@@ -141,7 +147,7 @@ portletURL.setParameter("fileEntryId", String.valueOf(fileEntryId));
 			String taglibOpenFolderWindow = "var folderWindow = window.open('" + selectFolderURL + "','folder', 'directories=no,height=640,location=no,menubar=no,resizable=yes,scrollbars=yes,status=no,toolbar=no,width=680'); void(''); folderWindow.focus();";
 			%>
 
-			<aui:button onClick='<%= taglibOpenFolderWindow %>' value="select" />
+			<aui:button onClick="<%= taglibOpenFolderWindow %>" value="select" />
 		</aui:field-wrapper>
 
 		<aui:button-row>

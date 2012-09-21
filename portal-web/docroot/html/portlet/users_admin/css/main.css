@@ -77,12 +77,11 @@
 
 	.lfr-change-logo img {
 		border-width: 0;
-		display: block;
 		width: auto;
 	}
 
 	.company-logo {
-		border: none;
+		border-width: 0;
 		width: 100px;
 	}
 
@@ -222,6 +221,12 @@
 
 	.permission-group {
 		margin: 10px 0 0 10px;
+	}
+
+	.user-table {
+		.user-status-selector {
+			float: right;
+		}
 	}
 
 	.view-all-link {

@@ -20,18 +20,22 @@ import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.trash.BaseTrashHandler;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
 import com.liferay.portal.service.RepositoryServiceUtil;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.model.DLFileVersion;
+import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileEntryLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFileVersionLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.trash.DuplicateEntryException;
 import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.util.TrashUtil;
+
+import javax.portlet.PortletRequest;
 
 /**
  * Represents the trash handler for the file entry entity.
@@ -55,23 +59,18 @@ public class DLFileEntryTrashHandler extends BaseTrashHandler {
 			restoredTitle = newName;
 		}
 
-		String originalTitle = restoredTitle;
+		String originalTitle = TrashUtil.stripTrashNamespace(restoredTitle);
 
-		if (restoredTitle.indexOf(StringPool.FORWARD_SLASH) > 0) {
-			originalTitle = restoredTitle.substring(
-				0, restoredTitle.indexOf(StringPool.FORWARD_SLASH));
-		}
-
-		DLFileEntry duplicatedFileEntry =
+		DLFileEntry duplicateDLFileEntry =
 			DLFileEntryLocalServiceUtil.fetchFileEntry(
 				dlFileEntry.getGroupId(), dlFileEntry.getFolderId(),
 				originalTitle);
 
-		if (duplicatedFileEntry != null) {
+		if (duplicateDLFileEntry != null) {
 			DuplicateEntryException dee = new DuplicateEntryException();
 
-			dee.setDuplicateEntryId(duplicatedFileEntry.getFileEntryId());
-			dee.setOldName(duplicatedFileEntry.getTitle());
+			dee.setDuplicateEntryId(duplicateDLFileEntry.getFileEntryId());
+			dee.setOldName(duplicateDLFileEntry.getTitle());
 			dee.setTrashEntryId(trashEntry.getEntryId());
 
 			throw dee;
@@ -82,6 +81,8 @@ public class DLFileEntryTrashHandler extends BaseTrashHandler {
 	 * Deletes all file entries with the matching primary keys.
 	 *
 	 * @param  classPKs the primary keys of the file entries to be deleted
+	 * @param  checkPermission whether to check permission before deleting each
+	 *         file entry
 	 * @throws PortalException if any one of the file entries could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -105,6 +106,32 @@ public class DLFileEntryTrashHandler extends BaseTrashHandler {
 	 */
 	public String getClassName() {
 		return CLASS_NAME;
+	}
+
+	@Override
+	public String getDeleteMessage() {
+		return "found-in-deleted-folder-x";
+	}
+
+	@Override
+	public String getRestoreLink(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException {
+
+		DLFileEntry dlFileEntry = getDLFileEntry(classPK);
+
+		return DLUtil.getDLControlPanelLink(
+			portletRequest, dlFileEntry.getFolderId());
+	}
+
+	@Override
+	public String getRestoreMessage(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException {
+
+		DLFileEntry dlFileEntry = getDLFileEntry(classPK);
+
+		DLFolder dlFolder = dlFileEntry.getFolder();
+
+		return DLUtil.getAbsolutePath(portletRequest, dlFolder.getFolderId());
 	}
 
 	/**

@@ -23,29 +23,13 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
 public class ViewConfigurePortletAvailableIGImageAPTest extends BaseTestCase {
 	public void testViewConfigurePortletAvailableIGImageAP()
 		throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Asset Publisher Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Asset Publisher Test Page");
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent("IG Folder Image Name"));
 		assertTrue(selenium.isElementNotPresent(
 				"//div[@class='asset-resource-info']/div/img"));

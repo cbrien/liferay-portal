@@ -17,10 +17,26 @@
 <%@ include file="/html/portlet/blogs/init.jsp" %>
 
 <%
+String strutsAction = ParamUtil.getString(request, "struts_action");
+
 String redirect = ParamUtil.getString(request, "redirect");
 
-if (Validator.isNull(redirect) || layoutTypePortlet.hasPortletId(PortletKeys.BLOGS_AGGREGATOR)) {
-	redirect = PortalUtil.getLayoutURL(layout, themeDisplay) + Portal.FRIENDLY_URL_SEPARATOR + "blogs";
+String portletId = portletDisplay.getId();
+
+if (Validator.isNull(redirect) || (strutsAction.equals("/blogs/view_entry") && !portletId.equals(PortletKeys.BLOGS))) {
+	PortletURL viewURL = renderResponse.createRenderURL();
+
+	if (portletId.equals(PortletKeys.BLOGS_ADMIN)) {
+		viewURL.setParameter("struts_action", "/blogs_admin/view");
+	}
+	else if (portletId.equals(PortletKeys.BLOGS_AGGREGATOR)) {
+		viewURL.setParameter("struts_action", "/blogs_aggregator/view");
+	}
+	else {
+		viewURL.setParameter("struts_action", "/blogs/view");
+	}
+
+	redirect = viewURL.toString();
 }
 
 BlogsEntry entry = (BlogsEntry)request.getAttribute(WebKeys.BLOGS_ENTRY);

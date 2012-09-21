@@ -24,6 +24,7 @@ import com.liferay.portal.kernel.repository.model.FileVersion;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.search.Indexer;
 import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
@@ -36,7 +37,6 @@ import com.liferay.portal.repository.liferayrepository.model.LiferayFileEntry;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFileVersion;
 import com.liferay.portal.repository.liferayrepository.model.LiferayFolder;
 import com.liferay.portal.service.ServiceContext;
-import com.liferay.portal.spring.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.util.PropsValues;
 import com.liferay.portlet.asset.NoSuchEntryException;
 import com.liferay.portlet.asset.model.AssetEntry;
@@ -51,12 +51,12 @@ import com.liferay.portlet.documentlibrary.model.DLFolderConstants;
 import com.liferay.portlet.documentlibrary.model.DLSyncConstants;
 import com.liferay.portlet.documentlibrary.service.base.DLAppHelperLocalServiceBaseImpl;
 import com.liferay.portlet.documentlibrary.social.DLActivityKeys;
-import com.liferay.portlet.documentlibrary.util.DLAppUtil;
 import com.liferay.portlet.documentlibrary.util.DLProcessorRegistryUtil;
 import com.liferay.portlet.documentlibrary.util.comparator.FileVersionVersionComparator;
 import com.liferay.portlet.social.model.SocialActivityConstants;
 import com.liferay.portlet.trash.model.TrashEntry;
 import com.liferay.portlet.trash.model.TrashVersion;
+import com.liferay.portlet.trash.util.TrashUtil;
 
 import java.io.Serializable;
 
@@ -381,23 +381,36 @@ public class DLAppHelperLocalServiceImpl
 
 		FileVersion fileVersion = new LiferayFileVersion(dlFileVersions.get(0));
 
-		dlFileEntryLocalService.updateStatus(
-			userId, fileVersion.getFileVersionId(), fileVersion.getStatus(),
-			new HashMap<String, Serializable>(), serviceContext);
+		if (fileVersion.isInTrash()) {
+			restoreFileEntryFromTrash(userId, fileEntry);
 
-		// File rank
+			DLFileEntry dlFileEntry = dlFileEntryLocalService.moveFileEntry(
+				userId, fileEntry.getFileEntryId(), newFolderId,
+				serviceContext);
 
-		dlFileRankLocalService.enableFileRanks(fileEntry.getFileEntryId());
+			dlFileRankLocalService.enableFileRanks(fileEntry.getFileEntryId());
 
-		// File shortcut
+			return new LiferayFileEntry(dlFileEntry);
+		}
+		else {
+			dlFileEntryLocalService.updateStatus(
+				userId, fileVersion.getFileVersionId(), fileVersion.getStatus(),
+				new HashMap<String, Serializable>(), serviceContext);
 
-		dlFileShortcutLocalService.enableFileShortcuts(
-			fileEntry.getFileEntryId());
+			// File rank
 
-		// App helper
+			dlFileRankLocalService.enableFileRanks(fileEntry.getFileEntryId());
 
-		return dlAppService.moveFileEntry(
-			fileEntry.getFileEntryId(), newFolderId, serviceContext);
+			// File shortcut
+
+			dlFileShortcutLocalService.enableFileShortcuts(
+				fileEntry.getFileEntryId());
+
+			// App helper
+
+			return dlAppService.moveFileEntry(
+				fileEntry.getFileEntryId(), newFolderId, serviceContext);
+		}
 	}
 
 	public FileEntry moveFileEntryToTrash(long userId, FileEntry fileEntry)
@@ -408,7 +421,7 @@ public class DLAppHelperLocalServiceImpl
 		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
 
 		dlFileEntry.setTitle(
-			DLAppUtil.appendTrashNamespace(dlFileEntry.getTitle()));
+			TrashUtil.appendTrashNamespace(dlFileEntry.getTitle()));
 
 		dlFileEntryPersistence.update(dlFileEntry, false);
 
@@ -468,12 +481,16 @@ public class DLAppHelperLocalServiceImpl
 
 	public DLFileShortcut moveFileShortcutFromTrash(
 			long userId, DLFileShortcut dlFileShortcut, long newFolderId,
-			long toFileEntryId, ServiceContext serviceContext)
+			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
+		if (dlFileShortcut.isInTrash()) {
+			restoreFileShortcutFromTrash(userId, dlFileShortcut);
+		}
+
 		return dlAppService.updateFileShortcut(
-			dlFileShortcut.getFileShortcutId(), newFolderId, toFileEntryId,
-			serviceContext);
+			dlFileShortcut.getFileShortcutId(), newFolderId,
+			dlFileShortcut.getToFileEntryId(), serviceContext);
 	}
 
 	public DLFileShortcut moveFileShortcutToTrash(
@@ -520,15 +537,24 @@ public class DLAppHelperLocalServiceImpl
 			ServiceContext serviceContext)
 		throws PortalException, SystemException {
 
-		// Folder
+		DLFolder dlFolder = (DLFolder)folder.getModel();
 
-		dlFolderLocalService.updateStatus(
-			userId, folder.getFolderId(), WorkflowConstants.STATUS_APPROVED,
-			new HashMap<String, Serializable>(), new ServiceContext());
+		if (dlFolder.isInTrash()) {
+			restoreFolderFromTrash(userId, folder);
+		}
+		else {
 
-		// File rank
+			// Folder
 
-		dlFileRankLocalService.enableFileRanksByFolderId(folder.getFolderId());
+			dlFolderLocalService.updateStatus(
+				userId, folder.getFolderId(), WorkflowConstants.STATUS_APPROVED,
+				new HashMap<String, Serializable>(), new ServiceContext());
+
+			// File rank
+
+			dlFileRankLocalService.enableFileRanksByFolderId(
+				folder.getFolderId());
+		}
 
 		return dlAppService.moveFolder(
 			folder.getFolderId(), parentFolderId, serviceContext);
@@ -543,7 +569,7 @@ public class DLAppHelperLocalServiceImpl
 			userId, folder.getFolderId(), WorkflowConstants.STATUS_IN_TRASH,
 			new HashMap<String, Serializable>(), new ServiceContext());
 
-		dlFolder.setName(DLAppUtil.appendTrashNamespace(dlFolder.getName()));
+		dlFolder.setName(TrashUtil.appendTrashNamespace(dlFolder.getName()));
 
 		dlFolderPersistence.update(dlFolder, false);
 
@@ -562,7 +588,7 @@ public class DLAppHelperLocalServiceImpl
 		DLFileEntry dlFileEntry = (DLFileEntry)fileEntry.getModel();
 
 		dlFileEntry.setTitle(
-			DLAppUtil.stripTrashNamespace(dlFileEntry.getTitle()));
+			TrashUtil.stripTrashNamespace(dlFileEntry.getTitle()));
 
 		dlFileEntryPersistence.update(dlFileEntry, false);
 
@@ -644,13 +670,9 @@ public class DLAppHelperLocalServiceImpl
 		TrashEntry trashEntry = trashEntryLocalService.getEntry(
 			DLFolderConstants.getClassName(), folder.getFolderId());
 
-		DLFolder dlFolder = dlFolderLocalService.updateStatus(
+		dlFolderLocalService.updateStatus(
 			userId, folder.getFolderId(), WorkflowConstants.STATUS_APPROVED,
 			new HashMap<String, Serializable>(), new ServiceContext());
-
-		dlFolder.setName(DLAppUtil.stripTrashNamespace(dlFolder.getName()));
-
-		dlFolderPersistence.update(dlFolder, false);
 
 		// File rank
 
@@ -1101,7 +1123,7 @@ public class DLAppHelperLocalServiceImpl
 	protected void registerDLProcessorCallback(
 		final FileEntry fileEntry, final FileVersion fileVersion) {
 
-		TransactionCommitCallbackUtil.registerCallback(
+		TransactionCommitCallbackRegistryUtil.registerCallback(
 			new Callable<Void>() {
 
 				public Void call() throws Exception {

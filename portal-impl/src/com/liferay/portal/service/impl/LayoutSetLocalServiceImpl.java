@@ -36,6 +36,7 @@ import com.liferay.portal.service.base.LayoutSetLocalServiceBaseImpl;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -148,17 +149,25 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 
 		// Logo
 
-		imageLocalService.deleteImage(layoutSet.getLogoId());
+		if (group.isStagingGroup() || !group.isOrganization() ||
+			!group.isSite()) {
+
+			imageLocalService.deleteImage(layoutSet.getLogoId());
+		}
 
 		// Layout set
 
-		if (group.isOrganization() && group.isSite()) {
-			layoutSet.setPageCount(0);
+		layoutSetPersistence.removeByG_P(groupId, privateLayout);
 
-			layoutSetPersistence.update(layoutSet, false);
-		}
-		else {
-			layoutSetPersistence.removeByG_P(groupId, privateLayout);
+		if (!group.isStagingGroup() && group.isOrganization() &&
+			group.isSite()) {
+
+			LayoutSet newLayoutSet = addLayoutSet(
+				group.getGroupId(), privateLayout);
+
+			newLayoutSet.setLogoId(layoutSet.getLogoId());
+
+			layoutSetPersistence.update(newLayoutSet, false);
 		}
 
 		// Counter
@@ -290,6 +299,19 @@ public class LayoutSetLocalServiceImpl extends LayoutSetLocalServiceBaseImpl {
 		layoutSet.setLayoutSetPrototypeUuid(layoutSetPrototypeUuid);
 
 		layoutSetPersistence.update(layoutSet, false);
+	}
+
+	public LayoutSet updateLogo(
+			long groupId, boolean privateLayout, boolean logo, byte[] bytes)
+		throws PortalException, SystemException {
+
+		InputStream is = null;
+
+		if (logo) {
+			is = new ByteArrayInputStream(bytes);
+		}
+
+		return updateLogo(groupId, privateLayout, logo, is);
 	}
 
 	public LayoutSet updateLogo(

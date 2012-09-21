@@ -20,7 +20,7 @@
 String portletURL = (String)request.getAttribute("liferay-ui:trash-undo:portletURL");
 
 if (SessionMessages.contains(portletRequest, portletDisplay.getId() + SessionMessages.KEY_SUFFIX_DELETE_SUCCESS_DATA)) {
-	Map<String, long[]> data = (HashMap<String, long[]>)SessionMessages.get(portletRequest, portletDisplay.getId() + SessionMessages.KEY_SUFFIX_DELETE_SUCCESS_DATA);
+	Map<String, String[]> data = (HashMap<String, String[]>)SessionMessages.get(portletRequest, portletDisplay.getId() + SessionMessages.KEY_SUFFIX_DELETE_SUCCESS_DATA);
 
 	if (data != null) {
 		int trashedEntriesCount = 0;
@@ -28,23 +28,23 @@ if (SessionMessages.contains(portletRequest, portletDisplay.getId() + SessionMes
 		Set<String> keys = data.keySet();
 
 		for (String key : keys) {
-			long[] primaryKeys = data.get(key);
+			String[] primaryKeys = data.get(key);
 
 			trashedEntriesCount += primaryKeys.length;
 		}
 %>
 
 		<div class="portlet-msg-success taglib-trash-undo">
-			<liferay-ui:message arguments='<%= trashedEntriesCount %>' key='<%= trashedEntriesCount > 1 ? "x-items-were-moved-to-the-recycle-bin" : "the-selected-item-was-moved-to-the-recycle-bin" %>' />
+			<aui:form action="<%= portletURL %>" name="undoForm">
+				<liferay-ui:message arguments="<%= trashedEntriesCount %>" key='<%= trashedEntriesCount > 1 ? "x-items-were-moved-to-the-recycle-bin" : "the-selected-item-was-moved-to-the-recycle-bin" %>' />
 
-			<a class="trash-undo-link" href="javascript:;" id="<%= namespace %>undo"><liferay-ui:message key="undo" /></a>
+				<a class="trash-undo-link" href="javascript:;" id="<%= namespace %>undo"><liferay-ui:message key="undo" /></a>
 
-			<aui:form action="<%= portletURL %>" cssClass="trash-undo-form" name="undoForm">
 				<aui:input name="redirect" type="hidden" value="<%= currentURL %>" />
 
 				<%
 				for (String key : keys) {
-					long[] primaryKeys = data.get(key);
+					String[] primaryKeys = data.get(key);
 				%>
 
 					<aui:input name="<%= key %>" type="hidden" value="<%= StringUtil.merge(primaryKeys) %>" />
@@ -53,7 +53,7 @@ if (SessionMessages.contains(portletRequest, portletDisplay.getId() + SessionMes
 				}
 				%>
 
-				<aui:button type="submit" value="undo" />
+				<aui:button cssClass="trash-undo-button" type="submit" value="undo" />
 			</aui:form>
 		</div>
 

@@ -97,6 +97,8 @@ else if (fileEntry != null) {
 	folderId = fileEntry.getFolderId();
 }
 
+boolean restore = false;
+
 PortletURL viewFolderURL = liferayPortletResponse.createRenderURL();
 
 viewFolderURL.setParameter("struts_action", "/document_library/view");
@@ -127,7 +129,7 @@ if (fileShortcut != null) {
 
 	</c:when>
 	<c:otherwise>
-		<span class="overlay document-action">
+		<span class="entry-action overlay">
 
 			<%= iconMenu %>
 

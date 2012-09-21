@@ -14,10 +14,12 @@
 
 package com.liferay.portlet.dynamicdatamapping.model.impl;
 
+import com.liferay.portal.LocaleException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.GetterUtil;
+import com.liferay.portal.kernel.util.HtmlUtil;
 import com.liferay.portal.kernel.util.ListUtil;
 import com.liferay.portal.kernel.util.LocaleUtil;
 import com.liferay.portal.kernel.util.StringBundler;
@@ -32,6 +34,7 @@ import com.liferay.portal.model.CacheField;
 import com.liferay.portlet.dynamicdatamapping.StructureFieldException;
 import com.liferay.portlet.dynamicdatamapping.model.DDMTemplate;
 import com.liferay.portlet.dynamicdatamapping.service.DDMTemplateLocalServiceUtil;
+import com.liferay.portlet.dynamicdatamapping.util.DDMXMLUtil;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -49,7 +52,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	public DDMStructureImpl() {
 	}
 
-	public List<String> getAvailableLocales() {
+	public List<String> getAvailableLanguageIds() {
 		Document document = getDocument();
 
 		Element rootElement = document.getRootElement();
@@ -60,7 +63,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		return ListUtil.fromArray(StringUtil.split(availableLocales));
 	}
 
-	public String getDefaultLocale() {
+	public String getDefaultLanguageId() {
 		Document document = getDocument();
 
 		if (document == null) {
@@ -126,7 +129,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	public String getFieldProperty(String fieldName, String property)
 		throws StructureFieldException {
 
-		return getFieldProperty(fieldName, property, getDefaultLocale());
+		return getFieldProperty(fieldName, property, getDefaultLanguageId());
 	}
 
 	public String getFieldProperty(
@@ -154,7 +157,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		String fieldName, String attributeName, String attributeValue) {
 
 		return getFields(
-			fieldName, attributeName, attributeValue, getDefaultLocale());
+			fieldName, attributeName, attributeValue, getDefaultLanguageId());
 	}
 
 	public Map<String, String> getFields(
@@ -164,13 +167,13 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		try {
 			StringBundler sb = new StringBundler(7);
 
-			sb.append("//dynamic-element[@name=\"");
-			sb.append(fieldName);
-			sb.append("\"] //dynamic-element[@");
-			sb.append(attributeName);
-			sb.append("=\"");
-			sb.append(attributeValue);
-			sb.append("\"]");
+			sb.append("//dynamic-element[@name=");
+			sb.append(HtmlUtil.escapeXPathAttribute(fieldName));
+			sb.append("] //dynamic-element[@");
+			sb.append(HtmlUtil.escapeXPath(attributeName));
+			sb.append("=");
+			sb.append(HtmlUtil.escapeXPathAttribute(attributeValue));
+			sb.append("]");
 
 			XPath xPathSelector = SAXReaderUtil.createXPath(sb.toString());
 
@@ -189,7 +192,7 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	}
 
 	public Map<String, Map<String, String>> getFieldsMap() {
-		return _getFieldsMap(getDefaultLocale());
+		return _getFieldsMap(getDefaultLanguageId());
 	}
 
 	public Map<String, Map<String, String>> getFieldsMap(String locale) {
@@ -210,6 +213,25 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 		Map<String, Map<String, String>> fieldsMap = getFieldsMap();
 
 		return fieldsMap.containsKey(fieldName);
+	}
+
+	@Override
+	public void prepareLocalizedFieldsForImport(Locale defaultImportLocale)
+		throws LocaleException {
+
+		super.prepareLocalizedFieldsForImport(defaultImportLocale);
+
+		Locale ddmStructureDefaultLocale = LocaleUtil.fromLanguageId(
+			getDefaultLanguageId());
+
+		try {
+			setXsd(
+				DDMXMLUtil.updateXMLDefaultLocale(
+					getXsd(), ddmStructureDefaultLocale, defaultImportLocale));
+		}
+		catch (Exception e) {
+			throw new LocaleException(e);
+		}
 	}
 
 	@Override
@@ -234,14 +256,16 @@ public class DDMStructureImpl extends DDMStructureBaseImpl {
 	private Map<String, String> _getField(Element element, String locale) {
 		Map<String, String> field = new HashMap<String, String>();
 
-		List<String> availableLocales = getAvailableLocales();
+		List<String> availableLocales = getAvailableLanguageIds();
 
 		if ((locale != null) && !availableLocales.contains(locale)) {
-			locale = getDefaultLocale();
+			locale = getDefaultLanguageId();
 		}
 
+		locale = HtmlUtil.escapeXPathAttribute(locale);
+
 		String xPathExpression =
-			"meta-data[@locale=\"".concat(locale).concat("\"]");
+			"meta-data[@locale=".concat(locale).concat("]");
 
 		XPath xPathSelector = SAXReaderUtil.createXPath(xPathExpression);
 

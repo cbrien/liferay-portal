@@ -66,11 +66,8 @@ public class Duration implements Cloneable, Serializable {
 	/**
 	 * Constructor Duration
 	 */
-	public Duration(int d, int h, int m, int s) {
-		_days = d;
-		_hours = h;
-		_minutes = m;
-		_seconds = s;
+	public Duration(int w) {
+		_weeks = w;
 	}
 
 	/**
@@ -83,8 +80,11 @@ public class Duration implements Cloneable, Serializable {
 	/**
 	 * Constructor Duration
 	 */
-	public Duration(int w) {
-		_weeks = w;
+	public Duration(int d, int h, int m, int s) {
+		_days = d;
+		_hours = h;
+		_minutes = m;
+		_seconds = s;
 	}
 
 	/**
@@ -306,9 +306,10 @@ public class Duration implements Cloneable, Serializable {
 	 * Method checkWeeksOkay
 	 */
 	protected void checkWeeksOkay(int f) {
-		if ((f != 0)
-			&& ((_days != 0) || (_hours != 0) || (_minutes != 0)
-				|| (_seconds != 0))) {
+		if ((f != 0) &&
+			((_days != 0) || (_hours != 0) || (_minutes != 0) ||
+			 (_seconds != 0))) {
+
 			throw new IllegalStateException(
 				"Weeks and non-weeks are incompatible");
 		}

@@ -14,25 +14,16 @@
 
 package com.liferay.portal.servlet;
 
-import com.liferay.portal.NoSuchUserException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
-import com.liferay.portal.kernel.util.GetterUtil;
 import com.liferay.portal.kernel.util.MethodHandler;
 import com.liferay.portal.kernel.util.MethodInvoker;
 import com.liferay.portal.kernel.util.MethodWrapper;
 import com.liferay.portal.kernel.util.ObjectValuePair;
-import com.liferay.portal.kernel.util.Validator;
-import com.liferay.portal.model.User;
+import com.liferay.portal.security.ac.AccessControlThreadLocal;
 import com.liferay.portal.security.auth.HttpPrincipal;
-import com.liferay.portal.security.auth.PrincipalThreadLocal;
-import com.liferay.portal.security.permission.PermissionChecker;
-import com.liferay.portal.security.permission.PermissionCheckerFactoryUtil;
-import com.liferay.portal.security.permission.PermissionThreadLocal;
-import com.liferay.portal.service.UserLocalServiceUtil;
-import com.liferay.portal.util.PortalInstances;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -70,11 +61,14 @@ public class TunnelServlet extends HttpServlet {
 
 		Object returnObj = null;
 
+		boolean remoteAccess = AccessControlThreadLocal.isRemoteAccess();
+
 		try {
+			AccessControlThreadLocal.setRemoteAccess(true);
+
 			ObjectValuePair<HttpPrincipal, Object> ovp =
 				(ObjectValuePair<HttpPrincipal, Object>)ois.readObject();
 
-			HttpPrincipal httpPrincipal = ovp.getKey();
 			Object ovpValue = ovp.getValue();
 
 			MethodHandler methodHandler = null;
@@ -98,47 +92,6 @@ public class TunnelServlet extends HttpServlet {
 				}
 			}
 
-			long companyId = PortalInstances.getCompanyId(request);
-
-			if (Validator.isNotNull(httpPrincipal.getLogin())) {
-				User user = null;
-
-				try {
-					user = UserLocalServiceUtil.getUserByEmailAddress(
-						companyId, httpPrincipal.getLogin());
-				}
-				catch (NoSuchUserException nsue) {
-				}
-
-				if (user == null) {
-					try {
-						user = UserLocalServiceUtil.getUserByScreenName(
-							companyId, httpPrincipal.getLogin());
-					}
-					catch (NoSuchUserException nsue) {
-					}
-				}
-
-				if (user == null) {
-					try {
-						user = UserLocalServiceUtil.getUserById(
-							GetterUtil.getLong(httpPrincipal.getLogin()));
-					}
-					catch (NoSuchUserException nsue) {
-					}
-				}
-
-				if (user != null) {
-					PrincipalThreadLocal.setName(user.getUserId());
-
-					PermissionChecker permissionChecker =
-						PermissionCheckerFactoryUtil.create(user);
-
-					PermissionThreadLocal.setPermissionChecker(
-						permissionChecker);
-				}
-			}
-
 			if (returnObj == null) {
 				if (methodHandler != null) {
 					returnObj = methodHandler.invoke(true);
@@ -159,6 +112,9 @@ public class TunnelServlet extends HttpServlet {
 		}
 		catch (Exception e) {
 			_log.error(e, e);
+		}
+		finally {
+			AccessControlThreadLocal.setRemoteAccess(remoteAccess);
 		}
 
 		if (returnObj != null) {

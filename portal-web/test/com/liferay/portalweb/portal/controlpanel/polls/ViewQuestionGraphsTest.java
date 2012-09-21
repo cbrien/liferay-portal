@@ -22,128 +22,46 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class ViewQuestionGraphsTest extends BaseTestCase {
 	public void testViewQuestionGraphs() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Go to"),
 			selenium.getText("//li[@id='_145_mySites']/a/span"));
 		selenium.mouseOver("//li[@id='_145_mySites']/a/span");
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Control Panel")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Control Panel");
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Polls", RuntimeVariables.replace("Polls"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Test Poll Question",
 			RuntimeVariables.replace("Test Poll Question"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Area", RuntimeVariables.replace("Area"));
 		selenium.waitForPopUp("viewChart", RuntimeVariables.replace("30000"));
 		selenium.selectWindow("viewChart");
 		selenium.close();
 		selenium.selectWindow("null");
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Horizontal Bar")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Horizontal Bar");
 		selenium.clickAt("link=Horizontal Bar",
 			RuntimeVariables.replace("Horizontal Bar"));
 		selenium.waitForPopUp("viewChart", RuntimeVariables.replace("30000"));
 		selenium.selectWindow("viewChart");
 		selenium.close();
 		selenium.selectWindow("null");
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Line")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Line");
 		selenium.clickAt("link=Line", RuntimeVariables.replace("Line"));
 		selenium.waitForPopUp("viewChart", RuntimeVariables.replace("30000"));
 		selenium.selectWindow("viewChart");
 		selenium.close();
 		selenium.selectWindow("null");
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Pie")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Pie");
 		selenium.clickAt("link=Pie", RuntimeVariables.replace("Pie"));
 		selenium.waitForPopUp("viewChart", RuntimeVariables.replace("30000"));
 		selenium.selectWindow("viewChart");
 		selenium.close();
 		selenium.selectWindow("null");
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Vertical Bar")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Vertical Bar");
 		selenium.clickAt("link=Vertical Bar",
 			RuntimeVariables.replace("Vertical Bar"));
 		selenium.waitForPopUp("viewChart", RuntimeVariables.replace("30000"));

@@ -22,46 +22,27 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class PreviousButtonAPTest extends BaseTestCase {
 	public void testPreviousButtonAP() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Asset Publisher Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Asset Publisher Test Page");
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Next"),
 			selenium.getText("//a[@class='next']"));
 		selenium.clickAt("//a[@class='next']", RuntimeVariables.replace("Next"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Next"),
 			selenium.getText("//a[@class='next']"));
 		selenium.clickAt("//a[@class='next']", RuntimeVariables.replace("Next"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Previous"),
 			selenium.getText("//a[@class='previous']"));
 		assertTrue(selenium.isElementNotPresent("//a[@class='next']"));
 		selenium.clickAt("//a[@class='previous']",
 			RuntimeVariables.replace("Previous"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Previous"),
 			selenium.getText("//a[@class='previous']"));
 		assertEquals(RuntimeVariables.replace("Next"),
@@ -69,7 +50,6 @@ public class PreviousButtonAPTest extends BaseTestCase {
 		selenium.clickAt("//a[@class='previous']",
 			RuntimeVariables.replace("Previous"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isElementNotPresent("//a[@class='previous']"));
 		assertEquals(RuntimeVariables.replace("Next"),
 			selenium.getText("//a[@class='next']"));

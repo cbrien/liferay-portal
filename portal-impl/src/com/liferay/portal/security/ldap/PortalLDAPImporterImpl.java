@@ -20,6 +20,7 @@ import com.liferay.portal.NoSuchUserGroupException;
 import com.liferay.portal.kernel.bean.BeanPropertiesUtil;
 import com.liferay.portal.kernel.cache.PortalCache;
 import com.liferay.portal.kernel.cache.SingleVMPoolUtil;
+import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
 import com.liferay.portal.kernel.ldap.LDAPUtil;
 import com.liferay.portal.kernel.log.Log;
@@ -342,11 +343,25 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 		long[] ldapServerIds = StringUtil.split(
 			PrefsPropsUtil.getString(companyId, "ldap.server.ids"), 0L);
 
-		if (ldapServerIds.length <= 0) {
-			ldapServerIds = new long[] {0};
+		for (long ldapServerId : ldapServerIds) {
+			User user = importLDAPUser(
+				ldapServerId, companyId, emailAddress, screenName);
+
+			if (user != null) {
+				return user;
+			}
 		}
 
-		for (long ldapServerId : ldapServerIds) {
+		for (int ldapServerId = 0;; ldapServerId++) {
+			String postfix = LDAPSettingsUtil.getPropertyPostfix(ldapServerId);
+
+			String providerUrl = PrefsPropsUtil.getString(
+				companyId, PropsKeys.LDAP_BASE_PROVIDER_URL + postfix);
+
+			if (Validator.isNull(providerUrl)) {
+				break;
+			}
+
 			User user = importLDAPUser(
 				ldapServerId, companyId, emailAddress, screenName);
 
@@ -708,7 +723,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 
 			userGroupIdKey = sb.toString();
 
-			userGroupId = (Long)_portalCache.get(userGroupIdKey);
+			userGroupId = _portalCache.get(userGroupIdKey);
 		}
 
 		if (userGroupId != null) {
@@ -1020,9 +1035,12 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 	}
 
 	protected void populateExpandoAttributes(
-		ExpandoBridge expandoBridge, Map<String, String> expandoAttributes) {
+		ExpandoBridge expandoBridge, Map<String, String[]> expandoAttributes) {
 
-		for (Map.Entry<String, String> expandoAttribute :
+		Map<String, Serializable> serializedExpandoAttributes =
+			new HashMap<String, Serializable>();
+
+		for (Map.Entry<String, String[]> expandoAttribute :
 				expandoAttributes.entrySet()) {
 
 			String name = expandoAttribute.getKey();
@@ -1033,18 +1051,21 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 
 			int type = expandoBridge.getAttributeType(name);
 
-			Serializable value = ExpandoConverterUtil.getAttributeFromString(
-				type, expandoAttribute.getValue());
+			Serializable value =
+				ExpandoConverterUtil.getAttributeFromStringArray(
+					type, expandoAttribute.getValue());
 
-			try {
-				ExpandoValueLocalServiceUtil.addValue(
-					expandoBridge.getCompanyId(), expandoBridge.getClassName(),
-					ExpandoTableConstants.DEFAULT_TABLE_NAME, name,
-					expandoBridge.getClassPK(), value);
-			}
-			catch (Exception e) {
-				_log.error(e, e);
-			}
+			serializedExpandoAttributes.put(name, value);
+		}
+
+		try {
+			ExpandoValueLocalServiceUtil.addValues(
+				expandoBridge.getCompanyId(), expandoBridge.getClassName(),
+				ExpandoTableConstants.DEFAULT_TABLE_NAME,
+				expandoBridge.getClassPK(), serializedExpandoAttributes);
+		}
+		catch (Exception e) {
+			_log.error(e, e);
 		}
 	}
 
@@ -1062,6 +1083,35 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 
 		populateExpandoAttributes(
 			contactExpandoBridge, ldapUser.getContactExpandoAttributes());
+	}
+
+	protected void updateLDAPUser(User ldapUser, Contact ldapContact, User user)
+		throws PortalException, SystemException {
+
+		Contact contact = user.getContact();
+
+		ldapContact.setAimSn(GetterUtil.getString(contact.getAimSn()));
+		ldapContact.setFacebookSn(
+			GetterUtil.getString(contact.getFacebookSn()));
+		ldapContact.setIcqSn(GetterUtil.getString(contact.getIcqSn()));
+		ldapContact.setJabberSn(GetterUtil.getString(contact.getJabberSn()));
+		ldapContact.setMale(GetterUtil.getBoolean(contact.getMale()));
+		ldapContact.setMsnSn(GetterUtil.getString(contact.getMsnSn()));
+		ldapContact.setMySpaceSn(GetterUtil.getString(contact.getMySpaceSn()));
+		ldapContact.setPrefixId(GetterUtil.getInteger(contact.getPrefixId()));
+		ldapContact.setSkypeSn(GetterUtil.getString(contact.getSkypeSn()));
+		ldapContact.setSmsSn(GetterUtil.getString(contact.getSmsSn()));
+		ldapContact.setSuffixId(GetterUtil.getInteger(contact.getSuffixId()));
+		ldapContact.setTwitterSn(GetterUtil.getString(contact.getTwitterSn()));
+		ldapContact.setYmSn(GetterUtil.getString(contact.getYmSn()));
+
+		ldapUser.setComments(GetterUtil.getString(user.getComments()));
+		ldapUser.setGreeting(GetterUtil.getString(user.getGreeting()));
+		ldapUser.setJobTitle(GetterUtil.getString(user.getJobTitle()));
+		ldapUser.setLanguageId(GetterUtil.getString(user.getLanguageId()));
+		ldapUser.setMiddleName(GetterUtil.getString(user.getMiddleName()));
+		ldapUser.setOpenId(GetterUtil.getString(user.getOpenId()));
+		ldapUser.setTimeZoneId(GetterUtil.getString(user.getTimeZoneId()));
 	}
 
 	protected User updateUser(
@@ -1165,6 +1215,8 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 			}
 		}
 
+		updateLDAPUser(ldapUser.getUser(), ldapUser.getContact(), user);
+
 		user = UserLocalServiceUtil.updateUser(
 			user.getUserId(), password, StringPool.BLANK, StringPool.BLANK,
 			passwordReset, ldapUser.getReminderQueryQuestion(),
@@ -1214,7 +1266,7 @@ public class PortalLDAPImporterImpl implements PortalLDAPImporter {
 		PortalLDAPImporterImpl.class);
 
 	private LDAPToPortalConverter _ldapToPortalConverter;
-	private PortalCache _portalCache = SingleVMPoolUtil.getCache(
+	private PortalCache<String, Long> _portalCache = SingleVMPoolUtil.getCache(
 		PortalLDAPImporter.class.getName(), false);
 
 }

@@ -22,28 +22,11 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class AddPortletHWPageVariationTest extends BaseTestCase {
 	public void testAddPortletHWPageVariation() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("link=Site Name")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
 		selenium.clickAt("link=Site Name", RuntimeVariables.replace("Site Name"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isElementPresent(
 				"//body[contains(@class,'live-view')]"));
 		assertTrue(selenium.isElementNotPresent(
@@ -51,7 +34,6 @@ public class AddPortletHWPageVariationTest extends BaseTestCase {
 		assertTrue(selenium.isPartialText("//li[2]/span/a", "Staging"));
 		selenium.clickAt("//li[2]/span/a", RuntimeVariables.replace("Staging"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Main Variation"),
 			selenium.getText("//li[1]/span/span"));
 		assertEquals(RuntimeVariables.replace("Page Variation Name"),
@@ -59,51 +41,35 @@ public class AddPortletHWPageVariationTest extends BaseTestCase {
 		selenium.clickAt("//li[2]/span/a",
 			RuntimeVariables.replace("Page Variation Name"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Main Variation"),
 			selenium.getText("//form/div/ul/li[1]/span/a"));
 		assertEquals(RuntimeVariables.replace("Page Variation Name"),
 			selenium.getText("//form/div/ul/li[2]/span/span"));
+		selenium.clickAt("//div[@id='dockbar']",
+			RuntimeVariables.replace("Dockbar"));
+		selenium.waitForElementPresent(
+			"//script[contains(@src,'/aui/aui-editable/aui-editable-min.js')]");
+		assertEquals(RuntimeVariables.replace("Add"),
+			selenium.getText("//li[@id='_145_addContent']/a/span"));
+		selenium.mouseOver("//li[@id='_145_addContent']/a/span");
+		selenium.waitForVisible("//a[@id='_145_addApplication']");
 		assertTrue(selenium.isPartialText("//a[@id='_145_addApplication']",
 				"More"));
 		selenium.clickAt("//a[@id='_145_addApplication']",
 			RuntimeVariables.replace("More"));
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("//div[@title='Hello World']/p/a")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForElementPresent(
+			"//script[contains(@src,'/aui/aui-live-search/aui-live-search-min.js')]");
+		selenium.waitForVisible("//input[@id='layout_configuration_content']");
+		selenium.type("//input[@id='layout_configuration_content']",
+			RuntimeVariables.replace("h"));
+		selenium.keyDown("//input[@id='layout_configuration_content']",
+			RuntimeVariables.replace("\\13"));
+		selenium.keyUp("//input[@id='layout_configuration_content']",
+			RuntimeVariables.replace("\\13"));
+		selenium.waitForVisible("//div[@title='Hello World']/p/a");
 		selenium.clickAt("//div[@title='Hello World']/p/a",
 			RuntimeVariables.replace("Add"));
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("//section")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("//section");
 		assertTrue(selenium.isVisible("//section"));
 	}
 }

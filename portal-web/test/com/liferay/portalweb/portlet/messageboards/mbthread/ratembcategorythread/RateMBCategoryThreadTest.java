@@ -22,25 +22,23 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class RateMBCategoryThreadTest extends BaseTestCase {
 	public void testRateMBCategoryThread() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Message Boards Test Page",
 			RuntimeVariables.replace("Message Boards Test Page"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("MB Category Name"),
 			selenium.getText("//a/strong"));
 		selenium.clickAt("//a/strong",
 			RuntimeVariables.replace("MB Category Name"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"MB Category Thread Message Subject"),
 			selenium.getText("//td[1]/a"));
 		selenium.clickAt("//td[1]/a",
 			RuntimeVariables.replace("MB Category Thread Message Subject"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("0 (0 Votes)"),
 			selenium.getText(
 				"//div[@class='taglib-ratings thumbs']/div/div/div"));
@@ -54,25 +52,8 @@ public class RateMBCategoryThreadTest extends BaseTestCase {
 				"//a[@class='aui-rating-element aui-rating-element-off aui-rating-thumb-down aui-rating-element-on']"));
 		selenium.clickAt("//div[@class='taglib-ratings thumbs']/div/div/a[1]",
 			RuntimeVariables.replace("Thumb Up"));
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace("+1 (1 Vote)")
-										.equals(selenium.getText(
-								"//div[@class='taglib-ratings thumbs']/div/div/div"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForText("//div[@class='taglib-ratings thumbs']/div/div/div",
+			"+1 (1 Vote)");
 		assertEquals(RuntimeVariables.replace("+1 (1 Vote)"),
 			selenium.getText(
 				"//div[@class='taglib-ratings thumbs']/div/div/div"));
@@ -86,25 +67,8 @@ public class RateMBCategoryThreadTest extends BaseTestCase {
 				"//a[@class='aui-rating-element aui-rating-element-off aui-rating-thumb-down aui-rating-element-on']"));
 		selenium.clickAt("//div[@class='taglib-ratings thumbs']/div/div/a[2]",
 			RuntimeVariables.replace("Thumb Down"));
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace("-1 (1 Vote)")
-										.equals(selenium.getText(
-								"//div[@class='taglib-ratings thumbs']/div/div/div"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForText("//div[@class='taglib-ratings thumbs']/div/div/div",
+			"-1 (1 Vote)");
 		assertEquals(RuntimeVariables.replace("-1 (1 Vote)"),
 			selenium.getText(
 				"//div[@class='taglib-ratings thumbs']/div/div/div"));
@@ -118,25 +82,8 @@ public class RateMBCategoryThreadTest extends BaseTestCase {
 				"//a[@class='aui-rating-element aui-rating-element-off aui-rating-thumb-down aui-rating-element-on']"));
 		selenium.clickAt("//div[@class='taglib-ratings thumbs']/div/div/a[2]",
 			RuntimeVariables.replace("Thumb Down"));
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace("0 (0 Votes)")
-										.equals(selenium.getText(
-								"//div[@class='taglib-ratings thumbs']/div/div/div"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForText("//div[@class='taglib-ratings thumbs']/div/div/div",
+			"0 (0 Votes)");
 		assertEquals(RuntimeVariables.replace("0 (0 Votes)"),
 			selenium.getText(
 				"//div[@class='taglib-ratings thumbs']/div/div/div"));

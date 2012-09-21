@@ -19,6 +19,8 @@ import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
 import com.liferay.portal.kernel.template.TemplateResource;
 
 import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Reader;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,8 +30,39 @@ import java.util.concurrent.atomic.AtomicReference;
  */
 public class CacheTemplateResource implements TemplateResource {
 
+	/**
+	 * The empty constructor is required by {@link java.io.Externalizable}. Do
+	 * not use this for any other purpose.
+	 */
+	public CacheTemplateResource() {
+	}
+
 	public CacheTemplateResource(TemplateResource templateResource) {
+		if (templateResource == null) {
+			throw new IllegalArgumentException("Template resource is null");
+		}
+
 		_templateResource = templateResource;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof CacheTemplateResource)) {
+			return false;
+		}
+
+		CacheTemplateResource cacheTemplateResource =
+			(CacheTemplateResource)obj;
+
+		if (_templateResource.equals(cacheTemplateResource._templateResource)) {
+			return true;
+		}
+
+		return false;
 	}
 
 	public long getLastModified() {
@@ -47,10 +80,6 @@ public class CacheTemplateResource implements TemplateResource {
 
 		try {
 			reader = _templateResource.getReader();
-
-			if (reader == null) {
-				return null;
-			}
 
 			char[] buffer = new char[1024];
 
@@ -78,6 +107,23 @@ public class CacheTemplateResource implements TemplateResource {
 
 	public String getTemplateId() {
 		return _templateResource.getTemplateId();
+	}
+
+	@Override
+	public int hashCode() {
+		return _templateResource.hashCode();
+	}
+
+	public void readExternal(ObjectInput objectInput)
+		throws ClassNotFoundException, IOException {
+
+		_lastModified = objectInput.readLong();
+		_templateResource = (TemplateResource)objectInput.readObject();
+	}
+
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+		objectOutput.writeLong(_lastModified);
+		objectOutput.writeObject(_templateResource);
 	}
 
 	private long _lastModified = System.currentTimeMillis();

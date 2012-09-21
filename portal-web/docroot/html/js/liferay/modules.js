@@ -67,6 +67,7 @@
 			'layout-configuration': ['aui-live-search', 'dd', 'liferay-layout'],
 			'layout-freeform': ['aui-resize', 'liferay-layout-column'],
 			'list-view': ['aui-base', 'transition'],
+			'logo-editor': ['aui-image-cropper', 'aui-io-request', 'liferay-portlet-base'],
 			'logo-selector': ['aui-base'],
 			'look-and-feel': ['aui-color-picker', 'aui-dialog', 'aui-io-request', 'aui-tabs-base'],
 			'menu': ['aui-debounce', 'aui-node'],
@@ -92,7 +93,7 @@
 			'token-list': ['aui-base', 'aui-template'],
 			'translation-manager': ['aui-base'],
 			'undo-manager': ['aui-data-set', 'base'],
-			'upload': ['aui-io-request', 'aui-swf', 'collection', 'swfupload'],
+			'upload': ['aui-io-request', 'aui-template', 'collection', 'liferay-portlet-base', 'uploader'],
 			'util-list-fields': ['aui-base'],
 			'util-window': ['aui-dialog', 'aui-dialog-iframe']
 		};

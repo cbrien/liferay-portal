@@ -65,6 +65,7 @@ layout.user.public.layouts.enabled
 layout.user.public.layouts.power.user.required
 ldap.attrs.transformer.impl
 locales.beta
+lock.listeners
 login.create.account.allow.custom.password
 login.events.post
 login.events.pre
@@ -89,6 +90,7 @@ phone.number.format.usa.regexp
 portlet.add.default.resource.check.enabled
 portlet.add.default.resource.check.whitelist
 portlet.add.default.resource.check.whitelist.actions
+rss.feeds.enabled
 sanitizer.impl
 servlet.session.create.events
 servlet.session.destroy.events

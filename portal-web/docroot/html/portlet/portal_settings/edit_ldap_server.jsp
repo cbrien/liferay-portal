@@ -64,11 +64,11 @@ String userMappingGroup = StringPool.BLANK;
 String userMappingUuid = StringPool.BLANK;
 
 for (int i = 0 ; i < userMappingArray.length ; i++) {
-	if (userMappingArray[i].indexOf("=") == -1) {
+	if (!userMappingArray[i].contains("=")) {
 		continue;
 	}
 
-	String mapping[] = userMappingArray[i].split("=");
+	String[] mapping = userMappingArray[i].split("=");
 
 	if (mapping.length != 2) {
 		continue;
@@ -124,11 +124,11 @@ String groupMappingDescription = StringPool.BLANK;
 String groupMappingUser = StringPool.BLANK;
 
 for (int i = 0 ; i < groupMappingArray.length ; i++) {
-	if (groupMappingArray[i].indexOf("=") == -1) {
+	if (!groupMappingArray[i].contains("=")) {
 		continue;
 	}
 
-	String mapping[] = groupMappingArray[i].split("=");
+	String[] mapping = groupMappingArray[i].split("=");
 
 	if (mapping.length != 2) {
 		continue;
@@ -200,7 +200,7 @@ for (int i = 0 ; i < groupMappingArray.length ; i++) {
 			String taglibOnClick = renderResponse.getNamespace() + "testSettings('ldapConnection');";
 			%>
 
-			<aui:button onClick='<%= taglibOnClick %>' value="test-ldap-connection" />
+			<aui:button onClick="<%= taglibOnClick %>" value="test-ldap-connection" />
 		</aui:button-row>
 	</aui:fieldset>
 
@@ -296,7 +296,7 @@ for (int i = 0 ; i < groupMappingArray.length ; i++) {
 		String taglibOnClick = renderResponse.getNamespace() + "saveLdap();";
 		%>
 
-		<aui:button name="saveButton" onClick='<%= taglibOnClick %>' value="save" />
+		<aui:button name="saveButton" onClick="<%= taglibOnClick %>" value="save" />
 
 		<aui:button href="<%= redirect %>" name="cancelButton" type="cancel" />
 	</aui:button-row>

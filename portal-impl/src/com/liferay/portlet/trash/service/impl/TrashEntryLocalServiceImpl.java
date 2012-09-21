@@ -16,9 +16,13 @@ package com.liferay.portlet.trash.service.impl;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.kernel.search.Hits;
 import com.liferay.portal.kernel.search.Indexable;
 import com.liferay.portal.kernel.search.IndexableType;
 import com.liferay.portal.kernel.search.Indexer;
+import com.liferay.portal.kernel.search.IndexerRegistryUtil;
+import com.liferay.portal.kernel.search.SearchContext;
+import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.trash.TrashHandler;
 import com.liferay.portal.kernel.trash.TrashHandlerRegistryUtil;
 import com.liferay.portal.kernel.util.ObjectValuePair;
@@ -57,6 +61,7 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 	 *         com.liferay.portlet.documentlibrary.model.DLFileVersion})
 	 * @param  typeSettingsProperties the type settings properties
 	 * @return the trashEntry
+	 * @throws PortalException if a user with the primary key could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
 	public TrashEntry addTrashEntry(
@@ -134,6 +139,25 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 
 					trashHandler.deleteTrashEntry(entry.getClassPK(), false);
 				}
+			}
+		}
+	}
+
+	public void checkEntriesAttachments()
+		throws PortalException, SystemException {
+
+		int count = groupPersistence.countAll();
+
+		int pages = count / Indexer.DEFAULT_INTERVAL;
+
+		for (int i = 0; i <= pages; i++) {
+			int start = (i * Indexer.DEFAULT_INTERVAL);
+			int end = start + Indexer.DEFAULT_INTERVAL;
+
+			List<Group> groups = groupPersistence.findAll(start, end);
+
+			for (Group group : groups) {
+				checkEntriesAttachments(group);
 			}
 		}
 	}
@@ -330,6 +354,48 @@ public class TrashEntryLocalServiceImpl extends TrashEntryLocalServiceBaseImpl {
 		long classNameId = PortalUtil.getClassNameId(className);
 
 		return trashVersionPersistence.findByC_C(classNameId, classPK);
+	}
+
+	public Hits search(
+			long companyId, long groupId, long userId, String keywords,
+			int start, int end, Sort sort)
+		throws SystemException {
+
+		try {
+			SearchContext searchContext = new SearchContext();
+
+			searchContext.setCompanyId(companyId);
+			searchContext.setEnd(end);
+			searchContext.setKeywords(keywords);
+			searchContext.setGroupIds(new long[] {groupId});
+
+			if (sort != null) {
+				searchContext.setSorts(new Sort[] {sort});
+			}
+
+			searchContext.setStart(start);
+			searchContext.setUserId(userId);
+
+			Indexer indexer = IndexerRegistryUtil.nullSafeGetIndexer(
+				TrashEntry.class);
+
+			return indexer.search(searchContext);
+		}
+		catch (Exception e) {
+			throw new SystemException(e);
+		}
+	}
+
+	protected void checkEntriesAttachments(Group group)
+		throws PortalException, SystemException {
+
+		Date date = getMaxAge(group);
+
+		for (TrashHandler trashHandler :
+				TrashHandlerRegistryUtil.getTrashHandlers()) {
+
+			trashHandler.deleteTrashAttachments(group, date);
+		}
 	}
 
 	protected Date getMaxAge(Group group)

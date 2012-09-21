@@ -1693,7 +1693,9 @@ public interface UserLocalService extends BaseLocalService,
 			com.liferay.portal.kernel.exception.SystemException;
 
 	/**
-	* Returns <code>true</code> if the user's password is expiring soon.
+	* Returns <code>true</code> if the password policy is configured to warn
+	* the user that his password is expiring and the remaining time until
+	* expiration is equal or less than the configured warning time.
 	*
 	* @param user the user
 	* @return <code>true</code> if the user's password is expiring soon;
@@ -2012,6 +2014,18 @@ public interface UserLocalService extends BaseLocalService,
 	* @throws SystemException if a system exception occurred
 	*/
 	public void setUserGroupUsers(long userGroupId, long[] userIds)
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException;
+
+	/**
+	* Removes the users from the teams of a group.
+	*
+	* @param groupId the primary key of the group
+	* @param userIds the primary keys of the users
+	* @throws PortalException if a portal exception occurred
+	* @throws SystemException if a system exception occurred
+	*/
+	public void unsetGroupTeamsUsers(long groupId, long[] userIds)
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException;
 

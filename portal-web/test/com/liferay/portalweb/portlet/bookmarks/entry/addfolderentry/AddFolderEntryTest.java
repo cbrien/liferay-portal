@@ -22,38 +22,20 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class AddFolderEntryTest extends BaseTestCase {
 	public void testAddFolderEntry() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Bookmarks Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Bookmarks Test Page");
 		selenium.clickAt("link=Bookmarks Test Page",
 			RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("//a/strong", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Add Bookmark"),
 			selenium.getText("//div[2]/ul/li[5]/a"));
 		selenium.clickAt("//div[2]/ul/li[5]/a",
 			RuntimeVariables.replace("Add Bookmark"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.type("_28_name", RuntimeVariables.replace("Test Folder Entry"));
 		selenium.type("_28_url",
 			RuntimeVariables.replace("http://www.liferay.com"));
@@ -61,7 +43,6 @@ public class AddFolderEntryTest extends BaseTestCase {
 			RuntimeVariables.replace("This is a test folder entry."));
 		selenium.clickAt("//input[@value='Save']", RuntimeVariables.replace(""));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace(
 				"Your request completed successfully."),
 			selenium.getText("//section/div/div/div/div[1]"));

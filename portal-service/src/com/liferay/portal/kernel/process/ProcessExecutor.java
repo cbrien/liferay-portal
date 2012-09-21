@@ -23,8 +23,11 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.process.log.ProcessOutputStream;
 import com.liferay.portal.kernel.util.NamedThreadFactory;
 import com.liferay.portal.kernel.util.PortalClassLoaderUtil;
+import com.liferay.portal.kernel.util.StreamUtil;
+import com.liferay.portal.kernel.util.StringPool;
 
 import java.io.EOFException;
+import java.io.File;
 import java.io.FileDescriptor;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -40,6 +43,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -86,8 +91,7 @@ public class ProcessExecutor {
 			commands.addAll(arguments);
 			commands.add(ProcessExecutor.class.getName());
 
-			ProcessBuilder processBuilder = new ProcessBuilder(
-				commands.toArray(new String[commands.size()]));
+			ProcessBuilder processBuilder = new ProcessBuilder(commands);
 
 			Process process = processBuilder.start();
 
@@ -174,6 +178,16 @@ public class ProcessExecutor {
 			ProcessCallable<?> processCallable =
 				(ProcessCallable<?>)objectInputStream.readObject();
 
+			String logPrefixString =
+				StringPool.OPEN_BRACKET.concat(
+					processCallable.toString()).concat(
+						StringPool.CLOSE_BRACKET);
+
+			byte[] logPrefix = logPrefixString.getBytes(StringPool.UTF8);
+
+			outProcessOutputStream.setLogPrefix(logPrefix);
+			errProcessOutputStream.setLogPrefix(logPrefix);
+
 			Serializable result = processCallable.call();
 
 			System.out.flush();
@@ -259,6 +273,10 @@ public class ProcessExecutor {
 			}
 		}
 
+		public static ConcurrentMap<String, Object> getAttributes() {
+			return _attributes;
+		}
+
 		public static ProcessOutputStream getProcessOutputStream() {
 			return _processOutputStream;
 		}
@@ -283,6 +301,8 @@ public class ProcessExecutor {
 		private ProcessContext() {
 		}
 
+		private static ConcurrentMap<String, Object> _attributes =
+			new ConcurrentHashMap<String, Object>();
 		private static AtomicReference<HeartbeatThread>
 			_heartbeatThreadReference = new AtomicReference<HeartbeatThread>();
 		private static ProcessOutputStream _processOutputStream;
@@ -490,11 +510,11 @@ public class ProcessExecutor {
 		public ProcessCallable<? extends Serializable> call() throws Exception {
 			ProcessCallable<?> resultProcessCallable = null;
 
+			UnsyncBufferedInputStream unsyncBufferedInputStream =
+				new UnsyncBufferedInputStream(_process.getInputStream());
+
 			try {
 				ObjectInputStream objectInputStream = null;
-
-				UnsyncBufferedInputStream unsyncBufferedInputStream =
-					new UnsyncBufferedInputStream(_process.getInputStream());
 
 				UnsyncByteArrayOutputStream unsyncByteArrayOutputStream =
 					new UnsyncByteArrayOutputStream();
@@ -557,6 +577,24 @@ public class ProcessExecutor {
 									returnValue);
 					}
 				}
+			}
+			catch (StreamCorruptedException sce) {
+				File file = File.createTempFile(
+					"corrupted-stream-dump-" + System.currentTimeMillis(),
+					".log");
+
+				_log.error(
+					"Dumping content of corrupted object input stream to " +
+						file.getAbsolutePath(),
+					sce);
+
+				FileOutputStream fileOutputStream = new FileOutputStream(file);
+
+				StreamUtil.transfer(
+					unsyncBufferedInputStream, fileOutputStream);
+
+				throw new ProcessException(
+					"Corrupted object input stream", sce);
 			}
 			catch (EOFException eofe) {
 				throw new ProcessException(

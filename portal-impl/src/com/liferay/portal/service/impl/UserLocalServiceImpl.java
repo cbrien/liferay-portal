@@ -58,6 +58,7 @@ import com.liferay.portal.kernel.search.SearchContext;
 import com.liferay.portal.kernel.search.Sort;
 import com.liferay.portal.kernel.spring.aop.Skip;
 import com.liferay.portal.kernel.transaction.Propagation;
+import com.liferay.portal.kernel.transaction.TransactionCommitCallbackRegistryUtil;
 import com.liferay.portal.kernel.transaction.Transactional;
 import com.liferay.portal.kernel.util.ArrayUtil;
 import com.liferay.portal.kernel.util.CharPool;
@@ -70,6 +71,7 @@ import com.liferay.portal.kernel.util.ParamUtil;
 import com.liferay.portal.kernel.util.PropsKeys;
 import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.StringUtil;
+import com.liferay.portal.kernel.util.UnicodeProperties;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.workflow.WorkflowConstants;
 import com.liferay.portal.kernel.workflow.WorkflowHandlerRegistryUtil;
@@ -87,6 +89,7 @@ import com.liferay.portal.model.PasswordPolicy;
 import com.liferay.portal.model.ResourceConstants;
 import com.liferay.portal.model.Role;
 import com.liferay.portal.model.RoleConstants;
+import com.liferay.portal.model.Team;
 import com.liferay.portal.model.Ticket;
 import com.liferay.portal.model.TicketConstants;
 import com.liferay.portal.model.User;
@@ -116,7 +119,6 @@ import com.liferay.portal.security.pwd.PwdToolkitUtil;
 import com.liferay.portal.service.BaseServiceImpl;
 import com.liferay.portal.service.ServiceContext;
 import com.liferay.portal.service.base.UserLocalServiceBaseImpl;
-import com.liferay.portal.spring.transaction.TransactionCommitCallbackUtil;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.portal.util.PrefsPropsUtil;
 import com.liferay.portal.util.PropsValues;
@@ -404,6 +406,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		indexer.reindex(userIds);
 
 		PermissionCacheUtil.clearCache();
+
+		addDefaultRolesAndTeams(groupId, userIds);
 	}
 
 	/**
@@ -789,9 +793,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		// Contact
 
-		Date birthday = PortalUtil.getDate(
-			birthdayMonth, birthdayDay, birthdayYear,
-			ContactBirthdayException.class);
+		Date birthday = getBirthday(birthdayMonth, birthdayDay, birthdayYear);
 
 		Contact contact = contactPersistence.create(user.getContactId());
 
@@ -896,8 +898,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			workflowServiceContext);
 
 		if (serviceContext != null) {
-			String passwordUnencrypted =
-				(String)serviceContext.getAttribute("passwordUnencrypted");
+			String passwordUnencrypted = (String)serviceContext.getAttribute(
+				"passwordUnencrypted");
 
 			if (Validator.isNotNull(passwordUnencrypted)) {
 				user.setPasswordUnencrypted(passwordUnencrypted);
@@ -2895,7 +2897,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
-	 * Returns <code>true</code> if the user's password is expiring soon.
+	 * Returns <code>true</code> if the password policy is configured to warn
+	 * the user that his password is expiring and the remaining time until
+	 * expiration is equal or less than the configured warning time.
 	 *
 	 * @param  user the user
 	 * @return <code>true</code> if the user's password is expiring soon;
@@ -2909,7 +2913,9 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		PasswordPolicy passwordPolicy = user.getPasswordPolicy();
 
-		if (passwordPolicy.isExpireable()) {
+		if (passwordPolicy.isExpireable() &&
+			(passwordPolicy.getWarningTime() > 0)) {
+
 			Date now = new Date();
 
 			if (user.getPasswordModifiedDate() == null) {
@@ -3500,6 +3506,26 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 	}
 
 	/**
+	 * Removes the users from the teams of a group.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  userIds the primary keys of the users
+	 * @throws PortalException if a portal exception occurred
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void unsetGroupTeamsUsers(long groupId, long[] userIds)
+		throws PortalException, SystemException {
+
+		List<Team> teams = teamPersistence.findByGroupId(groupId);
+
+		for (Team team : teams) {
+			unsetTeamUsers(team.getTeamId(), userIds);
+		}
+
+		PermissionCacheUtil.clearCache();
+	}
+
+	/**
 	 * Removes the users from the group.
 	 *
 	 * @param  groupId the primary key of the group
@@ -3513,6 +3539,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		throws PortalException, SystemException {
 
 		userGroupRoleLocalService.deleteUserGroupRoles(userIds, groupId);
+
+		userLocalService.unsetGroupTeamsUsers(groupId, userIds);
 
 		groupPersistence.removeUsers(groupId, userIds);
 
@@ -4013,9 +4041,8 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 			user.setJobTitle(jobTitle);
 			user.setExpandoBridgeAttributes(serviceContext);
 
-			Date birthday = PortalUtil.getDate(
-				birthdayMonth, birthdayDay, birthdayYear,
-				ContactBirthdayException.class);
+			Date birthday = getBirthday(
+				birthdayMonth, birthdayDay, birthdayYear);
 
 			Contact contact = user.getContact();
 
@@ -4365,7 +4392,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 				String passwordHistory = PrefsPropsUtil.getString(
 					user.getCompanyId(), PropsKeys.LDAP_ERROR_PASSWORD_HISTORY);
 
-				if (msg.indexOf(passwordHistory) != -1) {
+				if (msg.contains(passwordHistory)) {
 					throw new UserPasswordException(
 						UserPasswordException.PASSWORD_ALREADY_USED);
 				}
@@ -4770,9 +4797,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		// Contact
 
-		Date birthday = PortalUtil.getDate(
-			birthdayMonth, birthdayDay, birthdayYear,
-			ContactBirthdayException.class);
+		Date birthday = getBirthday(birthdayMonth, birthdayDay, birthdayYear);
 
 		long contactId = user.getContactId();
 
@@ -4943,6 +4968,83 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		userPersistence.update(user, false);
 
 		ticketLocalService.deleteTicket(ticket);
+	}
+
+	protected void addDefaultRolesAndTeams(long groupId, long[] userIds)
+		throws PortalException, SystemException {
+
+		List<Role> defaultSiteRoles = new ArrayList<Role>();
+
+		Group group = groupLocalService.getGroup(groupId);
+
+		UnicodeProperties typeSettingsProperties =
+			group.getTypeSettingsProperties();
+
+		long[] defaultSiteRoleIds = StringUtil.split(
+			typeSettingsProperties.getProperty("defaultSiteRoleIds"), 0L);
+
+		for (long defaultSiteRoleId : defaultSiteRoleIds) {
+			Role defaultSiteRole = rolePersistence.fetchByPrimaryKey(
+				defaultSiteRoleId);
+
+			if (defaultSiteRole == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to find role " + defaultSiteRoleId);
+				}
+
+				continue;
+			}
+
+			defaultSiteRoles.add(defaultSiteRole);
+		}
+
+		List<Team> defaultTeams = new ArrayList<Team>();
+
+		long[] defaultTeamIds = StringUtil.split(
+			typeSettingsProperties.getProperty("defaultTeamIds"), 0L);
+
+		for (long defaultTeamId : defaultTeamIds) {
+			Team defaultTeam = teamPersistence.findByPrimaryKey(defaultTeamId);
+
+			if (defaultTeam == null) {
+				if (_log.isWarnEnabled()) {
+					_log.warn("Unable to find team " + defaultTeamId);
+				}
+
+				continue;
+			}
+
+			defaultTeams.add(defaultTeam);
+		}
+
+		for (long userId : userIds) {
+			Set<Long> userRoleIdsSet = new HashSet<Long>();
+
+			for (Role role : defaultSiteRoles) {
+				if (!userPersistence.containsRole(userId, role.getRoleId())) {
+					userRoleIdsSet.add(role.getRoleId());
+				}
+			}
+
+			long[] userRoleIds = ArrayUtil.toArray(
+				userRoleIdsSet.toArray(new Long[userRoleIdsSet.size()]));
+
+			userGroupRoleLocalService.addUserGroupRoles(
+				userId, groupId, userRoleIds);
+
+			Set<Long> userTeamIdsSet = new HashSet<Long>();
+
+			for (Team team : defaultTeams) {
+				if (!userPersistence.containsTeam(userId, team.getTeamId())) {
+					userTeamIdsSet.add(team.getTeamId());
+				}
+			}
+
+			long[] userTeamIds = ArrayUtil.toArray(
+				userTeamIdsSet.toArray(new Long[userTeamIdsSet.size()]));
+
+			userPersistence.addTeams(userId, userTeamIds);
+		}
 	}
 
 	/**
@@ -5231,6 +5333,23 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 		return authResult;
 	}
 
+	protected Date getBirthday(
+			int birthdayMonth, int birthdayDay, int birthdayYear)
+		throws PortalException {
+
+		Date birthday = PortalUtil.getDate(
+			birthdayMonth, birthdayDay, birthdayYear,
+			ContactBirthdayException.class);
+
+		Date now = new Date();
+
+		if (birthday.after(now)) {
+			throw new ContactBirthdayException();
+		}
+
+		return birthday;
+	}
+
 	protected String getScreenName(String screenName) {
 		return StringUtil.lowerCase(StringUtil.trim(screenName));
 	}
@@ -5261,7 +5380,7 @@ public class UserLocalServiceImpl extends UserLocalServiceBaseImpl {
 
 		};
 
-		TransactionCommitCallbackUtil.registerCallback(callable);
+		TransactionCommitCallbackRegistryUtil.registerCallback(callable);
 	}
 
 	protected Hits search(

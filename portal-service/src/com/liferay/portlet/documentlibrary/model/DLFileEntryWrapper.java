@@ -907,12 +907,20 @@ public class DLFileEntryWrapper implements DLFileEntry,
 		return _dlFileEntry.getLuceneProperties();
 	}
 
+	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashFolder() {
+		return _dlFileEntry.getTrashFolder();
+	}
+
 	public boolean hasLock() {
 		return _dlFileEntry.hasLock();
 	}
 
 	public boolean isCheckedOut() {
 		return _dlFileEntry.isCheckedOut();
+	}
+
+	public boolean isInTrashFolder() {
+		return _dlFileEntry.isInTrashFolder();
 	}
 
 	public void setExtraSettingsProperties(

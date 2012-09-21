@@ -33,7 +33,12 @@ boolean ignoreRequestValue = GetterUtil.getBoolean((String) request.getAttribute
 String placeholder = (String)request.getAttribute("liferay-ui:input-field:placeholder");
 
 String type = ModelHintsUtil.getType(model, field);
+
 Map<String, String> hints = ModelHintsUtil.getHints(model, field);
+
+if (hints != null) {
+	type = GetterUtil.getString(hints.get("type"), type);
+}
 %>
 
 <c:if test="<%= type != null %>">
@@ -70,7 +75,7 @@ Map<String, String> hints = ModelHintsUtil.getHints(model, field);
 
 			boolean timeFormatAmPm = true;
 
-			if (timeFormatPattern.indexOf("a") == -1) {
+			if (!timeFormatPattern.contains("a")) {
 				timeFormatAmPm = false;
 			}
 
@@ -393,8 +398,8 @@ Map<String, String> hints = ModelHintsUtil.getHints(model, field);
 
 			String xml = StringPool.BLANK;
 
-			if (localized){
-				if(Validator.isNotNull(bean)) {
+			if (localized) {
+				if (Validator.isNotNull(bean)) {
 					xml = BeanPropertiesUtil.getString(bean, field);
 				}
 				else {
@@ -406,7 +411,7 @@ Map<String, String> hints = ModelHintsUtil.getHints(model, field);
 			%>
 
 			<c:choose>
-				<c:when test='<%= displayHeight.equals(ModelHintsConstants.TEXT_DISPLAY_HEIGHT) %>'>
+				<c:when test="<%= displayHeight.equals(ModelHintsConstants.TEXT_DISPLAY_HEIGHT) %>">
 
 					<%
 					if (Validator.isNotNull(value)) {

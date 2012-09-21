@@ -60,10 +60,12 @@ showSearch = showSearch && !results.isEmpty();
 />
 
 <%
+long portletDisplayDDMTemplateId = PortletDisplayTemplateUtil.getPortletDisplayTemplateDDMTemplateId(themeDisplay, pageDisplayStyle);
+
 if (portletDisplayDDMTemplateId > 0) {
 %>
 
-	<%= PortletDisplayTemplatesUtil.renderDDMTemplate(renderRequest, renderResponse, portletDisplayDDMTemplateId, results) %>
+	<%= PortletDisplayTemplateUtil.renderDDMTemplate(pageContext, portletDisplayDDMTemplateId, results) %>
 
 <%
 }
@@ -128,13 +130,15 @@ if ((rssDelta != SearchContainer.DEFAULT_DELTA) || !rssFormatType.equals(RSSUtil
 %>
 
 <div class="subscribe">
-	<liferay-ui:icon
-		image="rss"
-		label="<%= true %>"
-		method="get"
-		target="_blank"
-		url="<%= rssURL.toString() %>"
-	/>
+	<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
+		<liferay-ui:icon
+			image="rss"
+			label="<%= true %>"
+			method="get"
+			target="_blank"
+			url="<%= rssURL.toString() %>"
+		/>
+	</c:if>
 
 	<c:if test="<%= showSubscribeButton %>">
 		<c:choose>

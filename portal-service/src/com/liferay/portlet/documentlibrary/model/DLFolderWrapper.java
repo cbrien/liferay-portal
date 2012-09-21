@@ -815,12 +815,20 @@ public class DLFolderWrapper implements DLFolder, ModelWrapper<DLFolder> {
 		return _dlFolder.getPathArray();
 	}
 
+	public com.liferay.portlet.documentlibrary.model.DLFolder getTrashFolder() {
+		return _dlFolder.getTrashFolder();
+	}
+
 	public boolean hasInheritableLock() {
 		return _dlFolder.hasInheritableLock();
 	}
 
 	public boolean hasLock() {
 		return _dlFolder.hasLock();
+	}
+
+	public boolean isInTrashFolder() {
+		return _dlFolder.isInTrashFolder();
 	}
 
 	public boolean isLocked() {

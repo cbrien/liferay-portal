@@ -28,29 +28,13 @@ public class User_ViewSPVariationValentinesCopyFromNoneTest extends BaseTestCase
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Site Name")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent("link=Site Name");
 				selenium.clickAt("link=Site Name",
 					RuntimeVariables.replace("Site Name"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'live-view')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -61,7 +45,6 @@ public class User_ViewSPVariationValentinesCopyFromNoneTest extends BaseTestCase
 				selenium.clickAt("//div[@class='staging-bar']/ul/li[2]/span/a",
 					RuntimeVariables.replace("Staging"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'local-staging')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -83,7 +66,6 @@ public class User_ViewSPVariationValentinesCopyFromNoneTest extends BaseTestCase
 				selenium.clickAt("link=Christmas 2",
 					RuntimeVariables.replace("Christmas 2"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 			case 2:
 				assertEquals(RuntimeVariables.replace("Christmas 2"),
@@ -93,7 +75,6 @@ public class User_ViewSPVariationValentinesCopyFromNoneTest extends BaseTestCase
 				selenium.clickAt("//li[4]/span/span/a",
 					RuntimeVariables.replace("Valentines"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace("Valentines"),
 					selenium.getText("//li[4]/span/span/span[1]"));
 				assertEquals(RuntimeVariables.replace(

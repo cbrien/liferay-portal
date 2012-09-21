@@ -108,6 +108,12 @@ public class BookmarksFolderLocalServiceImpl
 
 		expandoValueLocalService.deleteValues(
 			BookmarksFolder.class.getName(), folder.getFolderId());
+
+		// Subscriptions
+
+		subscriptionLocalService.deleteSubscriptions(
+			folder.getCompanyId(), BookmarksFolder.class.getName(),
+			folder.getFolderId());
 	}
 
 	public void deleteFolder(long folderId)
@@ -187,6 +193,28 @@ public class BookmarksFolderLocalServiceImpl
 			getSubfolderIds(
 				folderIds, folder.getGroupId(), folder.getFolderId());
 		}
+	}
+
+	public void subscribeFolder(long userId, long groupId, long folderId)
+		throws PortalException, SystemException {
+
+		if (folderId == BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			folderId = groupId;
+		}
+
+		subscriptionLocalService.addSubscription(
+			userId, groupId, BookmarksFolder.class.getName(), folderId);
+	}
+
+	public void unsubscribeFolder(long userId, long groupId, long folderId)
+		throws PortalException, SystemException {
+
+		if (folderId == BookmarksFolderConstants.DEFAULT_PARENT_FOLDER_ID) {
+			folderId = groupId;
+		}
+
+		subscriptionLocalService.deleteSubscription(
+			userId, BookmarksFolder.class.getName(), folderId);
 	}
 
 	public BookmarksFolder updateFolder(
@@ -306,8 +334,8 @@ public class BookmarksFolderLocalServiceImpl
 	}
 
 	protected void validate(String name) throws PortalException {
-		if ((Validator.isNull(name)) || (name.indexOf("\\\\") != -1) ||
-			(name.indexOf("//") != -1)) {
+		if (Validator.isNull(name) || name.contains("\\\\") ||
+			name.contains("//")) {
 
 			throw new FolderNameException();
 		}

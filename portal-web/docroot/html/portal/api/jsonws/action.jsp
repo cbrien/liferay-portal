@@ -88,7 +88,6 @@ String signature = ParamUtil.getString(request, "signature");
 						String
 					</span>
 
-
 					<p class="lfr-api-param-comment">
 						authentication token used to validate the request
 					</p>
@@ -254,7 +253,7 @@ String signature = ParamUtil.getString(request, "signature");
 				};
 			</aui:script>
 
-			<aui:form action='<%= jsonWebServiceActionMapping.getServletContextPath() + "/api/secure/jsonws" + jsonWebServiceActionMapping.getPath() %>' enctype="<%= enctype %>" method="<%= jsonWebServiceActionMapping.getMethod() %>" name="execute">
+			<aui:form action='<%= jsonWebServiceActionMapping.getServletContextPath() + "/api/jsonws" + jsonWebServiceActionMapping.getPath() %>' enctype="<%= enctype %>" method="<%= jsonWebServiceActionMapping.getMethod() %>" name="execute">
 
 				<%
 				if (PropsValues.JSON_SERVICE_AUTH_TOKEN_ENABLED) {
@@ -349,7 +348,7 @@ String signature = ParamUtil.getString(request, "signature");
 		String jsServicePath = servletContextPath + jsonWebServiceActionMapping.getPath();
 
 		if (Validator.isNotNull(servletContextPath)) {
-			jsServicePath = StringUtil.replace(jsServicePath, servletContextPath + StringPool.FORWARD_SLASH, servletContextPath + StringPool.POUND);
+			jsServicePath = StringUtil.replace(jsServicePath, servletContextPath + StringPool.FORWARD_SLASH, servletContextPath + StringPool.PERIOD);
 		}
 		%>
 
@@ -491,8 +490,8 @@ String signature = ParamUtil.getString(request, "signature");
 Liferay.Service(
   '<%= jsServicePath %>',
   <tpl if="data.length">{
-<%= StringPool.FOUR_SPACES %><tpl for="data">{key}: {[this.formatDataType(values.key, values.value)]}<tpl if="!$last">,
-<%= StringPool.FOUR_SPACES %></tpl></tpl>
+<%= StringPool.FOUR_SPACES %><tpl for="data"><tpl if="key != 'p_auth'">{key}: {[this.formatDataType(values.key, values.value)]}<tpl if="!$last">,
+<%= StringPool.FOUR_SPACES %></tpl></tpl></tpl>
   },
   </tpl>function(obj) {
 <%= StringPool.FOUR_SPACES %>console.log(obj);
@@ -501,14 +500,14 @@ Liferay.Service(
 </textarea>
 
 <textarea class="aui-helper-hidden" id="curlTpl">
-curl <%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + jsonWebServiceActionMapping.getServletContextPath() %>/api/secure/jsonws<%= jsonWebServiceActionMapping.getPath() %> \\
+curl <%= themeDisplay.getPortalURL() + jsonWebServiceActionMapping.getServletContextPath() %>/api/jsonws<%= jsonWebServiceActionMapping.getPath() %> \\
   -u test@liferay.com:test <tpl if="data.length">\\
   <tpl for="data">-d {key}={[this.formatDataType(values.key, values.value)]} <tpl if="!$last">\\
   </tpl></tpl></tpl>
 </textarea>
 
 <textarea class="aui-helper-hidden" id="urlTpl">
-<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + jsonWebServiceActionMapping.getServletContextPath() %>/api/secure/jsonws<%= jsonWebServiceActionMapping.getPath() %><tpl if="data.length">/<tpl for="data">{key:this.toURIParam}/{value}<tpl if="!$last">/</tpl></tpl></tpl><tpl if="extraData.length">?<tpl for="extraData">{key:this.toURIParam}={value}<tpl if="!$last">&amp;</tpl></tpl></tpl>
+<%= themeDisplay.getPortalURL() + jsonWebServiceActionMapping.getServletContextPath() %>/api/jsonws<%= jsonWebServiceActionMapping.getPath() %><tpl if="data.length">/<tpl for="data">{key:this.toURIParam}/{value}<tpl if="!$last">/</tpl></tpl></tpl><tpl if="extraData.length">?<tpl for="extraData">{key:this.toURIParam}={value}<tpl if="!$last">&amp;</tpl></tpl></tpl>
 </textarea>
 	</c:when>
 	<c:otherwise>

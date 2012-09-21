@@ -28,29 +28,13 @@ public class User_AddSPVariationValentinesCopyFromNoneTest extends BaseTestCase 
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Site Name")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent("link=Site Name");
 				selenium.clickAt("link=Site Name",
 					RuntimeVariables.replace("Site Name"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'live-view')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -61,7 +45,6 @@ public class User_AddSPVariationValentinesCopyFromNoneTest extends BaseTestCase 
 				selenium.clickAt("//div[@class='staging-bar']/ul/li[2]/span/a",
 					RuntimeVariables.replace("Staging"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'local-staging')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -79,7 +62,6 @@ public class User_AddSPVariationValentinesCopyFromNoneTest extends BaseTestCase 
 				selenium.clickAt("link=Christmas 2",
 					RuntimeVariables.replace("Christmas 2"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 			case 2:
 				assertEquals(RuntimeVariables.replace(
@@ -92,43 +74,10 @@ public class User_AddSPVariationValentinesCopyFromNoneTest extends BaseTestCase 
 				selenium.clickAt("//a[@id='_170_manageLayoutSetBranches']",
 					RuntimeVariables.replace("Manage Site Pages Variations"));
 				Thread.sleep(5000);
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//input[@id='_170_addBranchButton']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("//input[@id='_170_addBranchButton']");
 				selenium.clickAt("//input[@id='_170_addBranchButton']",
 					RuntimeVariables.replace("Add Site Pages Variation"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("//input[@id='_170_name']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("//input[@id='_170_name']");
 				selenium.type("//input[@id='_170_name']",
 					RuntimeVariables.replace("Valentines"));
 				selenium.type("//textarea[@id='_170_description']",
@@ -140,7 +89,6 @@ public class User_AddSPVariationValentinesCopyFromNoneTest extends BaseTestCase 
 				selenium.clickAt("//input[@value='Add']",
 					RuntimeVariables.replace("Add"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace(
 						"Site page variation was added."),
 					selenium.getText("//div[@class='portlet-msg-success']"));

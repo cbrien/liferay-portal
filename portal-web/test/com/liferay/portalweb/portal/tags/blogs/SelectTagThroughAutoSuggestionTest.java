@@ -27,58 +27,25 @@ public class SelectTagThroughAutoSuggestionTest extends BaseTestCase {
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("link=Blogs Tags Test Page")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("link=Blogs Tags Test Page");
 				selenium.clickAt("link=Blogs Tags Test Page",
 					RuntimeVariables.replace("Blogs Tags Test Page"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace("Tags Blog Entry3 Title"),
 					selenium.getText(
 						"xPath=(//div[@class='entry-title']/h2/a)[1]"));
 				selenium.clickAt("xPath=(//div[@class='entry-title']/h2/a)[1]",
 					RuntimeVariables.replace("Tags Blog Entry3 Title"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace("Edit"),
 					selenium.getText("//span/a/span"));
 				selenium.click(RuntimeVariables.replace("//span/a/span"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//td[@id='cke_contents__33_editor']/iframe")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
+				selenium.waitForVisible(
+					"//td[@id='cke_contents__33_editor']/iframe");
 
 				boolean tagsVisible = selenium.isVisible(
 						"//input[@class='lfr-tag-selector-input aui-field-input-text']");
@@ -94,24 +61,8 @@ public class SelectTagThroughAutoSuggestionTest extends BaseTestCase {
 						"xPath=(//div[@class='lfr-panel-title'])[2]/span"));
 				selenium.clickAt("xPath=(//div[@class='lfr-panel-title'])[2]/span",
 					RuntimeVariables.replace("Categorization"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//input[@class='lfr-tag-selector-input aui-field-input-text']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//input[@class='lfr-tag-selector-input aui-field-input-text']");
 				assertTrue(selenium.isVisible(
 						"//input[@class='lfr-tag-selector-input aui-field-input-text']"));
 
@@ -120,56 +71,21 @@ public class SelectTagThroughAutoSuggestionTest extends BaseTestCase {
 					RuntimeVariables.replace(""));
 				selenium.typeKeys("//input[@class='lfr-tag-selector-input aui-field-input-text focus']",
 					RuntimeVariables.replace("selenium3*"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (RuntimeVariables.replace("selenium3 liferay3")
-												.equals(selenium.getText(
-										"//li[contains(@class,'aui-autocomplete-list-item')]"))) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForText("//li[contains(@class,'aui-autocomplete-list-item')]",
+					"selenium3 liferay3");
 				assertEquals(RuntimeVariables.replace("selenium3 liferay3"),
 					selenium.getText(
 						"//li[contains(@class,'aui-autocomplete-list-item')]"));
 				selenium.clickAt("//li[contains(@class,'aui-autocomplete-list-item')]",
 					RuntimeVariables.replace("selenium3 liferay3"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (RuntimeVariables.replace("selenium3 liferay3")
-												.equals(selenium.getText(
-										"xPath=(//span[@class='aui-textboxlistentry-text'])[2]"))) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForText("xPath=(//span[@class='aui-textboxlistentry-text'])[2]",
+					"selenium3 liferay3");
 				assertEquals(RuntimeVariables.replace("selenium3 liferay3"),
 					selenium.getText(
 						"xPath=(//span[@class='aui-textboxlistentry-text'])[2]"));
 				selenium.clickAt("//input[@value='Publish']",
 					RuntimeVariables.replace("Publish"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace(
 						"Your request completed successfully."),
 					selenium.getText("//div[@class='portlet-msg-success']"));

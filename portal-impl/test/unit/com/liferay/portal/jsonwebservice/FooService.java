@@ -31,6 +31,21 @@ public class FooService {
 
 		fooData.setId(id);
 
+		if (id == 7) {
+			FooDataImpl fooDataImpl = (FooDataImpl)fooData;
+
+			fooDataImpl.setName("James Bond");
+			fooDataImpl.setHeight(173);
+			fooDataImpl.setValue("licensed");
+		}
+		else if (id == -13) {
+			FooDataImpl fooDataImpl = (FooDataImpl)fooData;
+
+			fooDataImpl.setName("Dr. Evil");
+			fooDataImpl.setHeight(59);
+			fooDataImpl.setValue("fun");
+		}
+
 		return fooData;
 	}
 
@@ -77,6 +92,10 @@ public class FooService {
 		}
 
 		return '[' + name + '|' + number + ']';
+	}
+
+	public static String nullReturn() {
+		return null;
 	}
 
 	public static String srvcctx(ServiceContext serviceContext) {

@@ -75,13 +75,14 @@ request.setAttribute("websites.classPK", company.getAccountId());
 
 		document.<portlet:namespace />fm.<portlet:namespace />redirect.value = redirect;
 
-		<portlet:namespace />saveLdap();
 		<portlet:namespace />saveEmails();
+		<portlet:namespace />saveLdap();
+		<portlet:namespace />saveLocales();
 
 		submitForm(document.<portlet:namespace />fm, "<portlet:actionURL><portlet:param name="struts_action" value="/portal_settings/edit_company" /></portlet:actionURL>");
 	}
 </aui:script>
 
 <%!
-private static String[] _CATEGORY_NAMES = {"configuration", "identification", "miscellaneous"};
+private static final String[] _CATEGORY_NAMES = {"configuration", "identification", "miscellaneous"};
 %>

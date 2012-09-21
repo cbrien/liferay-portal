@@ -29,29 +29,13 @@ public class User_AddPageVariationSantaSPVariationSeasonTest
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Site Name")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent("link=Site Name");
 				selenium.clickAt("link=Site Name",
 					RuntimeVariables.replace("Site Name"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'live-view')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -62,7 +46,6 @@ public class User_AddPageVariationSantaSPVariationSeasonTest
 				selenium.clickAt("//div[@class='staging-bar']/ul/li[2]/span/a",
 					RuntimeVariables.replace("Staging"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'local-staging')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -79,7 +62,6 @@ public class User_AddPageVariationSantaSPVariationSeasonTest
 				selenium.clickAt("link=Season",
 					RuntimeVariables.replace("Season"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 			case 2:
 				assertEquals(RuntimeVariables.replace(
@@ -92,43 +74,11 @@ public class User_AddPageVariationSantaSPVariationSeasonTest
 				selenium.clickAt("//a[@id='_170_manageLayoutRevisions']/span",
 					RuntimeVariables.replace("Manage Page Variations"));
 				Thread.sleep(5000);
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//input[@id='_170_addRootLayoutBranch']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//input[@id='_170_addRootLayoutBranch']");
 				selenium.clickAt("//input[@id='_170_addRootLayoutBranch']",
 					RuntimeVariables.replace("Add Page Variation"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("//input[@id='_170_name']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("//input[@id='_170_name']");
 				selenium.type("//input[@id='_170_name']",
 					RuntimeVariables.replace("Santa"));
 				selenium.type("//textarea[@id='_170_description']",
@@ -136,7 +86,6 @@ public class User_AddPageVariationSantaSPVariationSeasonTest
 				selenium.clickAt("//input[@value='Add']",
 					RuntimeVariables.replace("Add"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace(
 						"Page variation was added."),
 					selenium.getText("//div[@class='portlet-msg-success']"));
@@ -145,28 +94,10 @@ public class User_AddPageVariationSantaSPVariationSeasonTest
 				assertEquals(RuntimeVariables.replace("Santa Description"),
 					selenium.getText("//tr[4]/td[2]"));
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent("link=Site Name")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent("link=Site Name");
 				selenium.clickAt("link=Site Name",
 					RuntimeVariables.replace("Site Name"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'live-view')]"));
 				assertTrue(selenium.isElementNotPresent(
@@ -177,7 +108,6 @@ public class User_AddPageVariationSantaSPVariationSeasonTest
 				selenium.clickAt("//div[@class='staging-bar']/ul/li[2]/span/a",
 					RuntimeVariables.replace("Staging"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.isElementPresent(
 						"//body[contains(@class,'local-staging')]"));
 				assertTrue(selenium.isElementNotPresent(

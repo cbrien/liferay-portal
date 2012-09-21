@@ -504,7 +504,7 @@ public class LayoutExporter {
 			portletDataContext.setScopeLayoutUuid(scopeLayoutUuid);
 
 			boolean[] exportPortletControls = getExportPortletControls(
-				companyId, portletId, portletDataContext, parameterMap);
+				companyId, portletId, portletDataContext, parameterMap, type);
 
 			_portletExporter.exportPortlet(
 				portletDataContext, layoutCache, portletId, layout,
@@ -656,7 +656,7 @@ public class LayoutExporter {
 			portletDataContext, layoutElement, layoutElement, layoutElement,
 			dlFileEntryTypesElement, dlFoldersElement, dlFilesElement,
 			dlFileRanksElement, dlRepositoriesElement,
-			dlRepositoryEntriesElement, article, null, false);
+			dlRepositoryEntriesElement, article, false);
 	}
 
 	protected void exportLayout(
@@ -789,7 +789,8 @@ public class LayoutExporter {
 		if (layout.isTypeArticle()) {
 			exportJournalArticle(portletDataContext, layout, layoutElement);
 		}
-		else if (layout.isTypeLinkToLayout()) {
+
+		if (layout.isTypeLinkToLayout()) {
 			UnicodeProperties typeSettingsProperties =
 				layout.getTypeSettingsProperties();
 
@@ -812,26 +813,37 @@ public class LayoutExporter {
 				}
 			}
 		}
-		else if (layout.isTypePortlet()) {
-			for (Portlet portlet : portlets) {
-				if (portlet.isScopeable() && layout.hasScopeGroup()) {
-					String key = PortletPermissionUtil.getPrimaryKey(
-						layout.getPlid(), portlet.getPortletId());
+		else if (layout.isSupportsEmbeddedPortlets()) {
 
-					portletIds.put(
-						key,
-						new Object[] {
-							portlet.getPortletId(), layout.getPlid(),
-							layout.getScopeGroup().getGroupId(),
-							StringPool.BLANK, layout.getUuid()
-						});
+			// Only portlet type layouts support page scoping
+
+			if (layout.isTypePortlet()) {
+				for (Portlet portlet : portlets) {
+					if (portlet.isScopeable() && layout.hasScopeGroup()) {
+						String key = PortletPermissionUtil.getPrimaryKey(
+							layout.getPlid(), portlet.getPortletId());
+
+						portletIds.put(
+							key,
+							new Object[] {
+								portlet.getPortletId(), layout.getPlid(),
+								layout.getScopeGroup().getGroupId(),
+								StringPool.BLANK, layout.getUuid()
+							});
+					}
 				}
 			}
 
 			LayoutTypePortlet layoutTypePortlet =
 				(LayoutTypePortlet)layout.getLayoutType();
 
-			for (String portletId : layoutTypePortlet.getPortletIds()) {
+			// The getAllPortlets method returns all effective portlets for any
+			// layout type, including embedded portlets, or in the case of panel
+			// type layout, selected portlets
+
+			for (Portlet portlet : layoutTypePortlet.getAllPortlets()) {
+				String portletId = portlet.getPortletId();
+
 				javax.portlet.PortletPreferences jxPreferences =
 					PortletPreferencesFactoryUtil.getLayoutPortletSetup(
 						layout, portletId);
@@ -1047,7 +1059,7 @@ public class LayoutExporter {
 	protected boolean[] getExportPortletControls(
 			long companyId, String portletId,
 			PortletDataContext portletDataContext,
-			Map<String, String[]> parameterMap)
+			Map<String, String[]> parameterMap, String type)
 		throws Exception {
 
 		boolean exportPortletData = MapUtil.getBoolean(
@@ -1116,7 +1128,9 @@ public class LayoutExporter {
 			}
 		}
 
-		if (exportPortletSetupAll) {
+		if (exportPortletSetupAll ||
+			(exportPortletSetup && type.equals("layout-prototype"))) {
+
 			exportCurPortletSetup = true;
 		}
 

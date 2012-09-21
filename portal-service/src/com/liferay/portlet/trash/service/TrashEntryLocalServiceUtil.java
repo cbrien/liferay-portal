@@ -279,6 +279,7 @@ public class TrashEntryLocalServiceUtil {
 	com.liferay.portlet.documentlibrary.model.DLFileVersion})
 	* @param typeSettingsProperties the type settings properties
 	* @return the trashEntry
+	* @throws PortalException if a user with the primary key could not be found
 	* @throws SystemException if a system exception occurred
 	*/
 	public static com.liferay.portlet.trash.model.TrashEntry addTrashEntry(
@@ -297,6 +298,12 @@ public class TrashEntryLocalServiceUtil {
 		throws com.liferay.portal.kernel.exception.PortalException,
 			com.liferay.portal.kernel.exception.SystemException {
 		getService().checkEntries();
+	}
+
+	public static void checkEntriesAttachments()
+		throws com.liferay.portal.kernel.exception.PortalException,
+			com.liferay.portal.kernel.exception.SystemException {
+		getService().checkEntriesAttachments();
 	}
 
 	/**
@@ -482,6 +489,15 @@ public class TrashEntryLocalServiceUtil {
 		java.lang.String className, long classPK)
 		throws com.liferay.portal.kernel.exception.SystemException {
 		return getService().getVersions(className, classPK);
+	}
+
+	public static com.liferay.portal.kernel.search.Hits search(long companyId,
+		long groupId, long userId, java.lang.String keywords, int start,
+		int end, com.liferay.portal.kernel.search.Sort sort)
+		throws com.liferay.portal.kernel.exception.SystemException {
+		return getService()
+				   .search(companyId, groupId, userId, keywords, start, end,
+			sort);
 	}
 
 	public static TrashEntryLocalService getService() {

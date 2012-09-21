@@ -15,6 +15,7 @@
 package com.liferay.portlet.documentlibrary.action;
 
 import com.liferay.portal.DuplicateLockException;
+import com.liferay.portal.NoSuchRepositoryEntryException;
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.json.JSONArray;
 import com.liferay.portal.kernel.json.JSONFactoryUtil;
@@ -25,11 +26,13 @@ import com.liferay.portal.kernel.portlet.LiferayWindowState;
 import com.liferay.portal.kernel.repository.model.FileEntry;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.servlet.ServletResponseConstants;
+import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.servlet.SessionErrors;
 import com.liferay.portal.kernel.servlet.SessionMessages;
 import com.liferay.portal.kernel.upload.UploadException;
 import com.liferay.portal.kernel.upload.UploadPortletRequest;
 import com.liferay.portal.kernel.util.Constants;
+import com.liferay.portal.kernel.util.ContentTypes;
 import com.liferay.portal.kernel.util.KeyValuePair;
 import com.liferay.portal.kernel.util.MimeTypesUtil;
 import com.liferay.portal.kernel.util.ParamUtil;
@@ -69,6 +72,7 @@ import com.liferay.portlet.documentlibrary.SourceFileNameException;
 import com.liferay.portlet.documentlibrary.model.DLFileEntry;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.util.DLUtil;
+import com.liferay.portlet.dynamicdatamapping.StorageFieldRequiredException;
 
 import java.io.InputStream;
 
@@ -92,6 +96,7 @@ import javax.portlet.WindowState;
 
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.fileupload.FileUploadBase.IOFileUploadException;
 import org.apache.struts.action.ActionForm;
 import org.apache.struts.action.ActionForward;
 import org.apache.struts.action.ActionMapping;
@@ -193,79 +198,7 @@ public class EditFileEntryAction extends PortletAction {
 			}
 		}
 		catch (Exception e) {
-			if (e instanceof DuplicateLockException ||
-				e instanceof InvalidFileVersionException ||
-				e instanceof NoSuchFileEntryException ||
-				e instanceof PrincipalException) {
-
-				if (e instanceof DuplicateLockException) {
-					DuplicateLockException dle = (DuplicateLockException)e;
-
-					SessionErrors.add(
-						actionRequest, dle.getClass(), dle.getLock());
-				}
-				else {
-					SessionErrors.add(actionRequest, e.getClass());
-				}
-
-				setForward(actionRequest, "portlet.document_library.error");
-			}
-			else if (e instanceof DuplicateFileException ||
-					 e instanceof DuplicateFolderNameException ||
-					 e instanceof FileExtensionException ||
-					 e instanceof FileMimeTypeException ||
-					 e instanceof FileNameException ||
-					 e instanceof FileSizeException ||
-					 e instanceof NoSuchFolderException ||
-					 e instanceof SourceFileNameException) {
-
-				if (!cmd.equals(Constants.ADD_MULTIPLE) &&
-					!cmd.equals(Constants.ADD_TEMP)) {
-
-					SessionErrors.add(actionRequest, e.getClass());
-
-					return;
-				}
-
-				if (e instanceof DuplicateFileException) {
-					HttpServletResponse response =
-						PortalUtil.getHttpServletResponse(actionResponse);
-
-					response.setStatus(
-						ServletResponseConstants.SC_DUPLICATE_FILE_EXCEPTION);
-				}
-				else if (e instanceof FileExtensionException) {
-					HttpServletResponse response =
-						PortalUtil.getHttpServletResponse(actionResponse);
-
-					response.setStatus(
-						ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION);
-				}
-				else if (e instanceof FileNameException) {
-					HttpServletResponse response =
-						PortalUtil.getHttpServletResponse(actionResponse);
-
-					response.setStatus(
-						ServletResponseConstants.SC_FILE_NAME_EXCEPTION);
-				}
-				else if (e instanceof FileSizeException) {
-					HttpServletResponse response =
-						PortalUtil.getHttpServletResponse(actionResponse);
-
-					response.setStatus(
-						ServletResponseConstants.SC_FILE_SIZE_EXCEPTION);
-				}
-
-				SessionErrors.add(actionRequest, e.getClass());
-			}
-			else if (e instanceof AssetCategoryException ||
-					 e instanceof AssetTagException) {
-
-				SessionErrors.add(actionRequest, e.getClass(), e);
-			}
-			else {
-				throw e;
-			}
+			handleUploadException(actionRequest, actionResponse, cmd, e);
 		}
 	}
 
@@ -281,6 +214,7 @@ public class EditFileEntryAction extends PortletAction {
 		catch (Exception e) {
 			if (e instanceof NoSuchFileEntryException ||
 				e instanceof NoSuchFileVersionException ||
+				e instanceof NoSuchRepositoryEntryException ||
 				e instanceof PrincipalException) {
 
 				SessionErrors.add(renderRequest, e.getClass());
@@ -431,6 +365,26 @@ public class EditFileEntryAction extends PortletAction {
 				themeDisplay.getScopeGroupId(), folderId, sourceFileName,
 				_TEMP_FOLDER_NAME, inputStream);
 		}
+		catch (Exception e) {
+			UploadException uploadException =
+				(UploadException)actionRequest.getAttribute(
+					WebKeys.UPLOAD_EXCEPTION);
+
+			if ((uploadException != null) &&
+				(uploadException.getCause() instanceof IOFileUploadException)) {
+
+				// Cancelled a temporary upload
+
+			}
+			else if ((uploadException != null) &&
+					 uploadException.isExceededSizeLimit()) {
+
+				throw new FileSizeException(uploadException.getCause());
+			}
+			else {
+				throw e;
+			}
+		}
 		finally {
 			StreamUtil.cleanUp(inputStream);
 		}
@@ -526,9 +480,10 @@ public class EditFileEntryAction extends PortletAction {
 
 		DLAppServiceUtil.moveFileEntryToTrash(fileEntryId);
 
-		Map<String, long[]> data = new HashMap<String, long[]>();
+		Map<String, String[]> data = new HashMap<String, String[]>();
 
-		data.put("restoreFileEntryIds", new long[] {fileEntryId});
+		data.put(
+			"restoreFileEntryIds", new String[] {String.valueOf(fileEntryId)});
 
 		SessionMessages.add(
 			actionRequest,
@@ -645,6 +600,88 @@ public class EditFileEntryAction extends PortletAction {
 		}
 
 		return errorMessage;
+	}
+
+	protected void handleUploadException(
+			ActionRequest actionRequest, ActionResponse actionResponse,
+			String cmd, Exception e)
+		throws Exception {
+
+		if (e instanceof AssetCategoryException ||
+			e instanceof AssetTagException) {
+
+			SessionErrors.add(actionRequest, e.getClass(), e);
+		}
+		else if (e instanceof DuplicateFileException ||
+				 e instanceof DuplicateFolderNameException ||
+				 e instanceof FileExtensionException ||
+				 e instanceof FileMimeTypeException ||
+				 e instanceof FileNameException ||
+				 e instanceof FileSizeException ||
+				 e instanceof NoSuchFolderException ||
+				 e instanceof SourceFileNameException ||
+				 e instanceof StorageFieldRequiredException) {
+
+			if (!cmd.equals(Constants.ADD_MULTIPLE) &&
+				!cmd.equals(Constants.ADD_TEMP)) {
+
+				SessionErrors.add(actionRequest, e.getClass());
+
+				return;
+			}
+
+			if (e instanceof DuplicateFileException ||
+				e instanceof FileExtensionException ||
+				e instanceof FileNameException ||
+				e instanceof FileSizeException) {
+
+				HttpServletResponse response =
+					PortalUtil.getHttpServletResponse(actionResponse);
+
+				response.setContentType(ContentTypes.TEXT_HTML);
+				response.setStatus(HttpServletResponse.SC_OK);
+
+				int errorType = 0;
+
+				if (e instanceof DuplicateFileException) {
+					errorType =
+						ServletResponseConstants.SC_DUPLICATE_FILE_EXCEPTION;
+				}
+				else if (e instanceof FileExtensionException) {
+					errorType =
+						ServletResponseConstants.SC_FILE_EXTENSION_EXCEPTION;
+				}
+				else if (e instanceof FileNameException) {
+					errorType = ServletResponseConstants.SC_FILE_NAME_EXCEPTION;
+				}
+				else if (e instanceof FileSizeException) {
+					errorType = ServletResponseConstants.SC_FILE_SIZE_EXCEPTION;
+				}
+
+				ServletResponseUtil.write(response, String.valueOf(errorType));
+			}
+
+			SessionErrors.add(actionRequest, e.getClass());
+		}
+		else if (e instanceof DuplicateLockException ||
+				 e instanceof InvalidFileVersionException ||
+				 e instanceof NoSuchFileEntryException ||
+				 e instanceof PrincipalException) {
+
+			if (e instanceof DuplicateLockException) {
+				DuplicateLockException dle = (DuplicateLockException)e;
+
+				SessionErrors.add(actionRequest, dle.getClass(), dle.getLock());
+			}
+			else {
+				SessionErrors.add(actionRequest, e.getClass());
+			}
+
+			setForward(actionRequest, "portlet.document_library.error");
+		}
+		else {
+			throw e;
+		}
 	}
 
 	protected void moveFileEntries(

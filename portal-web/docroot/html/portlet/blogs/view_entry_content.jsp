@@ -26,7 +26,7 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 
 <c:choose>
 	<c:when test="<%= BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.VIEW) && (entry.isVisible() || (entry.getUserId() == user.getUserId()) || BlogsEntryPermission.contains(permissionChecker, entry, ActionKeys.UPDATE)) %>">
-		<div class="entry <%= WorkflowConstants.toLabel(entry.getStatus()) %>">
+		<div class="entry <%= WorkflowConstants.toLabel(entry.getStatus()) %>" id="<portlet:namespace /><%= entry.getEntryId() %>">
 			<div class="entry-content">
 
 				<%
@@ -117,14 +117,14 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 
 								<portlet:actionURL var="deleteEntryURL">
 									<portlet:param name="struts_action" value="/blogs/edit_entry" />
-									<portlet:param name="<%= Constants.CMD %>" value="<%= TrashUtil.isTrashEnabled(themeDisplay.getScopeGroupId()) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
+									<portlet:param name="<%= Constants.CMD %>" value="<%= TrashUtil.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE %>" />
 									<portlet:param name="redirect" value="<%= viewURL %>" />
 									<portlet:param name="entryId" value="<%= String.valueOf(entry.getEntryId()) %>" />
 								</portlet:actionURL>
 
 								<liferay-ui:icon-delete
 									label="<%= true %>"
-									trash="<%= TrashUtil.isTrashEnabled(themeDisplay.getScopeGroupId()) %>"
+									trash="<%= TrashUtil.isTrashEnabled(scopeGroupId) %>"
 									url="<%= deleteEntryURL %>"
 								/>
 							</td>
@@ -189,7 +189,7 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 
 			<div class="entry-footer">
 				<div class="entry-author">
-					<liferay-ui:message key="written-by" /> <%= HtmlUtil.escape(PortalUtil.getUserName(entry.getUserId(), entry.getUserName())) %>
+					<liferay-ui:message key="written-by" /> <%= HtmlUtil.escape(PortalUtil.getUserName(entry)) %>
 				</div>
 
 				<div class="stats">
@@ -265,6 +265,7 @@ AssetEntry assetEntry = (AssetEntry)request.getAttribute("view_entry_content.jsp
 
 					<c:if test='<%= enableSocialBookmarks && socialBookmarksDisplayPosition.equals("bottom") %>'>
 						<liferay-ui:social-bookmarks
+							contentId="<%= String.valueOf(entry.getEntryId()) %>"
 							displayStyle="<%= socialBookmarksDisplayStyle %>"
 							target="_blank"
 							title="<%= entry.getTitle() %>"

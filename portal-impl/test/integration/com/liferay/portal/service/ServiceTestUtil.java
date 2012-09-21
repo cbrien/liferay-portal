@@ -64,12 +64,17 @@ import com.liferay.portlet.documentlibrary.trash.DLFolderTrashHandler;
 import com.liferay.portlet.documentlibrary.util.DLIndexer;
 import com.liferay.portlet.documentlibrary.workflow.DLFileEntryWorkflowHandler;
 import com.liferay.portlet.journal.workflow.JournalArticleWorkflowHandler;
-import com.liferay.portlet.messageboards.util.MBIndexer;
+import com.liferay.portlet.messageboards.util.MBMessageIndexer;
 import com.liferay.portlet.messageboards.workflow.MBDiscussionWorkflowHandler;
 import com.liferay.portlet.messageboards.workflow.MBMessageWorkflowHandler;
 import com.liferay.portlet.trash.util.TrashIndexer;
 import com.liferay.portlet.usersadmin.util.ContactIndexer;
 import com.liferay.portlet.usersadmin.util.UserIndexer;
+import com.liferay.portlet.wiki.trash.WikiNodeTrashHandler;
+import com.liferay.portlet.wiki.trash.WikiPageTrashHandler;
+import com.liferay.portlet.wiki.util.WikiNodeIndexer;
+import com.liferay.portlet.wiki.util.WikiPageIndexer;
+import com.liferay.portlet.wiki.workflow.WikiPageWorkflowHandler;
 import com.liferay.util.PwdGenerator;
 
 import java.util.Calendar;
@@ -90,6 +95,10 @@ import java.util.Set;
 public class ServiceTestUtil {
 
 	public static final int THREAD_COUNT = 25;
+
+	public static Group addGroup() throws Exception {
+		return addGroup(randomString());
+	}
 
 	public static Group addGroup(long parentGroupId, String name)
 		throws Exception {
@@ -286,8 +295,10 @@ public class ServiceTestUtil {
 		IndexerRegistryUtil.register(new UserIndexer());
 		IndexerRegistryUtil.register(new BookmarksIndexer());
 		IndexerRegistryUtil.register(new DLIndexer());
-		IndexerRegistryUtil.register(new MBIndexer());
+		IndexerRegistryUtil.register(new MBMessageIndexer());
 		IndexerRegistryUtil.register(new TrashIndexer());
+		IndexerRegistryUtil.register(new WikiNodeIndexer());
+		IndexerRegistryUtil.register(new WikiPageIndexer());
 
 		// Upgrade
 
@@ -352,6 +363,8 @@ public class ServiceTestUtil {
 		TrashHandlerRegistryUtil.register(new DLFileEntryTrashHandler());
 		TrashHandlerRegistryUtil.register(new DLFileShortcutTrashHandler());
 		TrashHandlerRegistryUtil.register(new DLFolderTrashHandler());
+		TrashHandlerRegistryUtil.register(new WikiNodeTrashHandler());
+		TrashHandlerRegistryUtil.register(new WikiPageTrashHandler());
 
 		// Workflow
 
@@ -362,6 +375,7 @@ public class ServiceTestUtil {
 		WorkflowHandlerRegistryUtil.register(new MBDiscussionWorkflowHandler());
 		WorkflowHandlerRegistryUtil.register(new MBMessageWorkflowHandler());
 		WorkflowHandlerRegistryUtil.register(new UserWorkflowHandler());
+		WorkflowHandlerRegistryUtil.register(new WikiPageWorkflowHandler());
 
 		// Company
 

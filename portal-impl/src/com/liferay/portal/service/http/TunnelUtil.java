@@ -78,7 +78,7 @@ public class TunnelUtil {
 			String ioeMessage = ioe.getMessage();
 
 			if ((ioeMessage != null) &&
-				(ioeMessage.indexOf("HTTP response code: 401") != -1)) {
+				ioeMessage.contains("HTTP response code: 401")) {
 
 				throw new PrincipalException(ioeMessage);
 			}
@@ -128,7 +128,7 @@ public class TunnelUtil {
 			String ioeMessage = ioe.getMessage();
 
 			if ((ioeMessage != null) &&
-				(ioeMessage.indexOf("HTTP response code: 401") != -1)) {
+				ioeMessage.contains("HTTP response code: 401")) {
 
 				throw new PrincipalException(ioeMessage);
 			}
@@ -151,16 +151,7 @@ public class TunnelUtil {
 			return null;
 		}
 
-		URL url = null;
-
-		if (Validator.isNull(httpPrincipal.getLogin()) ||
-			Validator.isNull(httpPrincipal.getPassword())) {
-
-			url = new URL(httpPrincipal.getUrl() + "/api/liferay/do");
-		}
-		else {
-			url = new URL(httpPrincipal.getUrl() + "/api/secure/liferay/do");
-		}
+		URL url = new URL(httpPrincipal.getUrl() + "/api/liferay/do");
 
 		HttpURLConnection httpURLConnection =
 			(HttpURLConnection)url.openConnection();

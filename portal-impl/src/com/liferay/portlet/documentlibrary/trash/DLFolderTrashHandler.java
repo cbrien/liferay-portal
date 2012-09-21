@@ -21,7 +21,6 @@ import com.liferay.portal.kernel.repository.Repository;
 import com.liferay.portal.kernel.repository.model.Folder;
 import com.liferay.portal.kernel.trash.BaseTrashHandler;
 import com.liferay.portal.kernel.trash.TrashRenderer;
-import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.repository.liferayrepository.LiferayRepository;
 import com.liferay.portal.service.RepositoryServiceUtil;
@@ -29,8 +28,13 @@ import com.liferay.portlet.documentlibrary.model.DLFolder;
 import com.liferay.portlet.documentlibrary.service.DLAppLocalServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLAppServiceUtil;
 import com.liferay.portlet.documentlibrary.service.DLFolderLocalServiceUtil;
+import com.liferay.portlet.documentlibrary.service.DLFolderServiceUtil;
+import com.liferay.portlet.documentlibrary.util.DLUtil;
 import com.liferay.portlet.trash.DuplicateEntryException;
 import com.liferay.portlet.trash.model.TrashEntry;
+import com.liferay.portlet.trash.util.TrashUtil;
+
+import javax.portlet.PortletRequest;
 
 /**
  * Represents the trash handler for the folder entity.
@@ -53,21 +57,16 @@ public class DLFolderTrashHandler extends BaseTrashHandler {
 			restoredTitle = newName;
 		}
 
-		String originalTitle = restoredTitle;
+		String originalTitle = TrashUtil.stripTrashNamespace(restoredTitle);
 
-		if (restoredTitle.indexOf(StringPool.FORWARD_SLASH) > 0) {
-			originalTitle = restoredTitle.substring(
-				0, restoredTitle.indexOf(StringPool.FORWARD_SLASH));
-		}
-
-		DLFolder duplicatedFolder = DLFolderLocalServiceUtil.fetchFolder(
+		DLFolder duplicateDLFolder = DLFolderLocalServiceUtil.fetchFolder(
 			dlFolder.getGroupId(), dlFolder.getParentFolderId(), originalTitle);
 
-		if (duplicatedFolder != null) {
+		if (duplicateDLFolder != null) {
 			DuplicateEntryException dee = new DuplicateEntryException();
 
-			dee.setDuplicateEntryId(duplicatedFolder.getFolderId());
-			dee.setOldName(duplicatedFolder.getName());
+			dee.setDuplicateEntryId(duplicateDLFolder.getFolderId());
+			dee.setOldName(duplicateDLFolder.getName());
 			dee.setTrashEntryId(trashEntry.getEntryId());
 
 			throw dee;
@@ -78,6 +77,8 @@ public class DLFolderTrashHandler extends BaseTrashHandler {
 	 * Deletes all folders with the matching primary keys.
 	 *
 	 * @param  classPKs the primary keys of the folders to be deleted
+	 * @param  checkPermission whether to check permission before deleting each
+	 *         folder
 	 * @throws PortalException if any one of the folders could not be found
 	 * @throws SystemException if a system exception occurred
 	 */
@@ -86,10 +87,10 @@ public class DLFolderTrashHandler extends BaseTrashHandler {
 
 		for (long classPK : classPKs) {
 			if (checkPermission) {
-				DLAppServiceUtil.deleteFolder(classPK);
+				DLFolderServiceUtil.deleteFolder(classPK, false);
 			}
 			else {
-				DLAppLocalServiceUtil.deleteFolder(classPK);
+				DLFolderLocalServiceUtil.deleteFolder(classPK, false);
 			}
 		}
 	}
@@ -101,6 +102,31 @@ public class DLFolderTrashHandler extends BaseTrashHandler {
 	 */
 	public String getClassName() {
 		return CLASS_NAME;
+	}
+
+	@Override
+	public String getDeleteMessage() {
+		return "found-in-deleted-folder-x";
+	}
+
+	@Override
+	public String getRestoreLink(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException {
+
+		DLFolder dlFolder = getDLFolder(classPK);
+
+		return DLUtil.getDLControlPanelLink(
+			portletRequest, dlFolder.getParentFolderId());
+	}
+
+	@Override
+	public String getRestoreMessage(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException {
+
+		DLFolder dlFolder = getDLFolder(classPK);
+
+		return DLUtil.getAbsolutePath(
+			portletRequest, dlFolder.getParentFolderId());
 	}
 
 	/**

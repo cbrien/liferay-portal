@@ -29,7 +29,11 @@ if (Validator.isNull(doAsUserId)) {
 
 long doAsGroupId = themeDisplay.getDoAsGroupId();
 
-String ckEditorConfigFileName = ParamUtil.getString(request, "ckEditorConfigFileName", "ckconfig.jsp");
+String ckEditorConfigFileName = ParamUtil.getString(request, "ckEditorConfigFileName");
+
+if (!_ckEditorConfigFileNames.contains(ckEditorConfigFileName)) {
+	ckEditorConfigFileName = "ckconfig.jsp";
+}
 
 boolean useCustomDataProcessor = false;
 
@@ -57,6 +61,7 @@ if (Validator.isNotNull(onChangeMethod)) {
 	onChangeMethod = namespace + onChangeMethod;
 }
 
+boolean resizable = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-editor:resizable"));
 boolean skipEditorLoading = GetterUtil.getBoolean((String)request.getAttribute("liferay-ui:input-editor:skipEditorLoading"));
 String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolbarSet");
 %>
@@ -64,14 +69,6 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 <c:if test="<%= hideImageResizing %>">
 	<liferay-util:html-top outputKey="js_editor_ckeditor_hide_image_resizing">
 		<style type="text/css">
-			td.cke_dialog_ui_hbox_first {
-				display:none !important;
-			}
-
-			td.cke_dialog_footer td.cke_dialog_ui_hbox_first {
-				display:block !important;
-			}
-
 			a.cke_dialog_tab {
 				display: none !important;
 			}
@@ -162,7 +159,7 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 	<textarea id="<%= name %>" name="<%= name %>" style="display: none;"></textarea>
 </div>
 
-<aui:script>
+<aui:script use="aui-base">
 	(function() {
 		function setData() {
 			<c:if test="<%= Validator.isNotNull(initMethod) %>">
@@ -190,7 +187,7 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 		CKEDITOR.replace(
 			'<%= name %>',
 			{
-				customConfig: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/<%= HtmlUtil.escapeJS(ckEditorConfigFileName) %>?p_l_id=<%= plid %>&p_p_id=<%= HttpUtil.encodeURL(portletId) %>&p_main_path=<%= HttpUtil.encodeURL(mainPath) %>&doAsUserId=<%= HttpUtil.encodeURL(doAsUserId) %>&doAsGroupId=<%= HttpUtil.encodeURL(String.valueOf(doAsGroupId)) %>&cssPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeCss()) %>&cssClasses=<%= HttpUtil.encodeURL(cssClasses) %>&imagesPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeImages()) %>&languageId=<%= HttpUtil.encodeURL(LocaleUtil.toLanguageId(locale)) %><%= configParams %>',
+				customConfig: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/<%= HtmlUtil.escapeJS(ckEditorConfigFileName) %>?p_l_id=<%= plid %>&p_p_id=<%= HttpUtil.encodeURL(portletId) %>&p_main_path=<%= HttpUtil.encodeURL(mainPath) %>&doAsUserId=<%= HttpUtil.encodeURL(doAsUserId) %>&doAsGroupId=<%= HttpUtil.encodeURL(String.valueOf(doAsGroupId)) %>&cssPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeCss()) %>&cssClasses=<%= HttpUtil.encodeURL(cssClasses) %>&imagesPath=<%= HttpUtil.encodeURL(themeDisplay.getPathThemeImages()) %>&languageId=<%= HttpUtil.encodeURL(LocaleUtil.toLanguageId(locale)) %>&resizable=<%= resizable %><%= configParams %>',
 				filebrowserBrowseUrl: '<%= PortalUtil.getPathContext() %>/html/js/editor/ckeditor/editor/filemanager/browser/liferay/browser.html?Connector=<%= connectorURL %><%= fileBrowserParams %>',
 				filebrowserUploadUrl: null,
 				toolbar: '<%= TextFormatter.format(HtmlUtil.escapeJS(toolbarSet), TextFormatter.M) %>'
@@ -266,6 +263,46 @@ String toolbarSet = (String)request.getAttribute("liferay-ui:input-editor:toolba
 
 			}
 		);
+
+		<%
+		if (toolbarSet.equals("creole")) {
+		%>
+
+			Liferay.provide(
+				window,
+				'<%= name %>creoleImageHandler',
+				function(event) {
+					var A = AUI();
+
+					var dialog = event.data.definition.dialog;
+
+					if (dialog.getName() == 'image') {
+						var lockButton = A.one('.cke_btn_locked');
+
+						if (lockButton) {
+							var imageProperties = lockButton.ancestor('.cke_dialog_ui_hbox_first');
+
+							if (imageProperties) {
+								imageProperties.hide();
+							}
+						}
+
+						var imagePreviewBox = A.one('.ImagePreviewBox');
+
+						if (imagePreviewBox) {
+							imagePreviewBox.setStyle('width', 410);
+						}
+					}
+				},
+				['aui-base']
+			);
+
+			ckEditor.on('dialogShow', window['<%= name %>creoleImageHandler']);
+
+		<%
+		}
+		%>
+
 	})();
 
 </aui:script>
@@ -285,4 +322,6 @@ public String marshallParams(Map<String, String> params) {
 
 	return sb.toString();
 }
+
+private static Set<String> _ckEditorConfigFileNames = SetUtil.fromArray(new String[] {"ckconfig.jsp", "ckconfig_bbcode.jsp", "ckconfig_creole.jsp"});
 %>

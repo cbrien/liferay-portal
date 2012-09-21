@@ -252,6 +252,15 @@ public class PortalUtil {
 		return getPortal().getCanonicalURL(completeURL, themeDisplay, layout);
 	}
 
+	public static String getCanonicalURL(
+			String completeURL, ThemeDisplay themeDisplay, Layout layout,
+			boolean forceLayoutFriendlyURL)
+		throws PortalException, SystemException {
+
+		return getPortal().getCanonicalURL(
+			completeURL, themeDisplay, layout, forceLayoutFriendlyURL);
+	}
+
 	/**
 	 * @deprecated {@link #getCDNHost(boolean)}
 	 */
@@ -337,6 +346,18 @@ public class PortalUtil {
 		throws PortalException, SystemException {
 
 		return getPortal().getControlPanelFullURL(scopeGroupId, ppid, params);
+	}
+
+	public static long getControlPanelPlid(long companyId)
+		throws PortalException, SystemException {
+
+		return getPortal().getControlPanelPlid(companyId);
+	}
+
+	public static long getControlPanelPlid(PortletRequest portletRequest)
+		throws PortalException, SystemException {
+
+		return getPortal().getControlPanelPlid(portletRequest);
 	}
 
 	public static Set<Portlet> getControlPanelPortlets(
@@ -757,10 +778,6 @@ public class PortalUtil {
 		return getPortal().getOriginalServletRequest(request);
 	}
 
-	public static String getOuterPortletId(HttpServletRequest request) {
-		return getPortal().getOuterPortletId(request);
-	}
-
 	public static long getParentGroupId(long scopeGroupId)
 		throws PortalException, SystemException {
 
@@ -998,6 +1015,10 @@ public class PortalUtil {
 		return getPortal().getPortletTitle(portlet, user);
 	}
 
+	public static String getPortletTitle(RenderRequest renderRequest) {
+		return getPortal().getPortletTitle(renderRequest);
+	}
+
 	public static String getPortletTitle(RenderResponse renderResponse) {
 		return getPortal().getPortletTitle(renderResponse);
 	}
@@ -1224,6 +1245,10 @@ public class PortalUtil {
 		return getPortal().getUserId(portletRequest);
 	}
 
+	public static String getUserName(BaseModel<?> baseModel) {
+		return getPortal().getUserName(baseModel);
+	}
+
 	public static String getUserName(long userId, String defaultUserName) {
 		return getPortal().getUserName(userId, defaultUserName);
 	}
@@ -1374,13 +1399,13 @@ public class PortalUtil {
 	}
 
 	public static boolean isGroupAdmin(User user, long groupId)
-			throws Exception {
+		throws Exception {
 
 		return getPortal().isGroupAdmin(user, groupId);
 	}
 
 	public static boolean isGroupOwner(User user, long groupId)
-			throws Exception {
+		throws Exception {
 
 		return getPortal().isGroupOwner(user, groupId);
 	}
@@ -1437,6 +1462,10 @@ public class PortalUtil {
 
 	public static boolean isReservedParameter(String name) {
 		return getPortal().isReservedParameter(name);
+	}
+
+	public static boolean isRSSFeedsEnabled() {
+		return getPortal().isRSSFeedsEnabled();
 	}
 
 	public static boolean isSecure(HttpServletRequest request) {
@@ -1511,6 +1540,20 @@ public class PortalUtil {
 		throws IOException, ServletException {
 
 		getPortal().sendError(status, e, request, response);
+	}
+
+	public static void sendRSSFeedsDisabledError(
+			HttpServletRequest request, HttpServletResponse response)
+		throws IOException, ServletException {
+
+		getPortal().sendRSSFeedsDisabledError(request, response);
+	}
+
+	public static void sendRSSFeedsDisabledError(
+			PortletRequest portletRequest, PortletResponse portletResponse)
+		throws IOException, ServletException {
+
+		getPortal().sendRSSFeedsDisabledError(portletRequest, portletResponse);
 	}
 
 	/**

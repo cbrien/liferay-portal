@@ -49,6 +49,8 @@ AUI.add(
 
 		var STRUTS_ACTION = 'struts_action';
 
+		var SRC_ENTRIES_PAGINATOR = 1;
+
 		var SRC_HISTORY = 2;
 
 		var SRC_SEARCH = 3;
@@ -73,6 +75,7 @@ AUI.add(
 
 						instance._documentLibraryContainer = documentLibraryContainer;
 
+						instance._eventDataProcessed = instance.ns('dataProcessed');
 						instance._eventDataRequest = instance.ns('dataRequest');
 						instance._eventDataRetrieveSuccess = instance.ns('dataRetrieveSuccess');
 						instance._eventOpenDocument = instance.ns('openDocument');
@@ -104,7 +107,7 @@ AUI.add(
 
 						var displayStyle = config.displayStyle;
 
-						var displayStyleCSSClass = 'document-display-style';
+						var displayStyleCSSClass = 'entry-display-style';
 
 						var displayStyleToolbar = instance.byId(DISPLAY_STYLE_TOOLBAR);
 
@@ -132,7 +135,7 @@ AUI.add(
 						selectConfig.namespace = namespace;
 						selectConfig.portletContainerId = portletContainerId;
 						selectConfig.repositories = config.repositories;
-						selectConfig.selector = 'document-selector';
+						selectConfig.selector = 'entry-selector';
 
 						instance._appViewSelect = new Liferay.AppViewSelect(selectConfig);
 
@@ -148,7 +151,7 @@ AUI.add(
 						};
 
 						moveConfig.displayStyleCSSClass = displayStyleCSSClass;
-						moveConfig.draggableCSSClass = 'document-link';
+						moveConfig.draggableCSSClass = 'entry-link';
 						moveConfig.namespace = namespace;
 						moveConfig.portletContainerId = portletContainerId;
 						moveConfig.portletGroup = 'document-library';
@@ -313,6 +316,10 @@ AUI.add(
 
 							instance._setSearchResults(content);
 						}
+
+						Liferay.fire(instance._eventDataProcessed);
+
+						WIN[instance.ns('toggleActionsButton')]();
 					},
 
 					_onPageLoaded: function(event) {
@@ -427,16 +434,6 @@ AUI.add(
 					_searchFileEntry: function(searchData) {
 						var instance = this;
 
-						if (searchData.showRepositoryTabs || searchData.showSearchInfo) {
-							var entriesContainer = instance._entriesContainer;
-
-							entriesContainer.empty();
-
-							var searchingTPL = Lang.sub(TPL_MESSAGE_SEARCHING, [Liferay.Language.get('searching,-please-wait')]);
-
-							entriesContainer.html(searchingTPL);
-						}
-
 						instance._documentLibraryContainer.all('.document-entries-paginator').hide();
 
 						var requestParams = {};
@@ -458,6 +455,14 @@ AUI.add(
 								src: Liferay.DL_SEARCH
 							}
 						);
+
+						if (searchData.showRepositoryTabs || searchData.showSearchInfo) {
+							var entriesContainer = instance._entriesContainer;
+
+							var searchingTPL = Lang.sub(TPL_MESSAGE_SEARCHING, [Liferay.Language.get('searching,-please-wait')]);
+
+							entriesContainer.html(searchingTPL);
+						}
 					},
 
 					_setSearchResults: function(content) {
@@ -588,6 +593,8 @@ AUI.add(
 				}
 			}
 		);
+
+		Liferay.DL_ENTRIES_PAGINATOR = SRC_ENTRIES_PAGINATOR;
 
 		Liferay.DL_SEARCH = SRC_SEARCH;
 

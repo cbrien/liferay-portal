@@ -12,7 +12,7 @@ alter table BlogsEntry add smallImageURL STRING null;
 
 alter table BookmarksEntry add userName VARCHAR(75) null;
 alter table BookmarksEntry add resourceBlockId LONG;
-alter table BookmarksEntry add description VARCHAR(75) null;
+alter table BookmarksEntry add description STRING null;
 
 COMMIT_TRANSACTION;
 
@@ -301,10 +301,10 @@ alter table Layout add sourcePrototypeLayoutUuid VARCHAR(75) null;
 alter table Layout drop column layoutPrototypeId;
 alter table Layout drop column dlFolderId;
 
+COMMIT_TRANSACTION;
+
 update Layout set createDate = CURRENT_TIMESTAMP;
 update Layout set modifiedDate = CURRENT_TIMESTAMP;
-
-COMMIT_TRANSACTION;
 
 create table LayoutBranch (
 	LayoutBranchId LONG not null primary key,
@@ -648,6 +648,11 @@ create table VirtualHost (
 
 alter table WorkflowDefinitionLink add classPK LONG;
 alter table WorkflowDefinitionLink add typePK LONG;
+
+COMMIT_TRANSACTION;
+
+update WorkflowDefinitionLink set classPK = 0;
+update WorkflowDefinitionLink set typePK = 0;
 
 drop table QUARTZ_BLOB_TRIGGERS;
 drop table QUARTZ_CALENDARS;

@@ -22,35 +22,18 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class SearchTagsTest extends BaseTestCase {
 	public void testSearchTags() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Blogs Tags Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Blogs Tags Test Page");
 		selenium.clickAt("link=Blogs Tags Test Page",
 			RuntimeVariables.replace("Blogs Tags Test Page"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.type("//input[@id='_33_keywords']",
 			RuntimeVariables.replace("\"selenium1 liferay1\""));
 		selenium.clickAt("//input[@value='Search']",
 			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("Tags Blog Entry1 Title"));
 		assertFalse(selenium.isTextPresent("Tags Blog Entry2 Title"));
 		assertFalse(selenium.isTextPresent("Tags Blog Entry3 Title"));
@@ -59,7 +42,6 @@ public class SearchTagsTest extends BaseTestCase {
 		selenium.clickAt("//input[@value='Search']",
 			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("Tags Blog Entry1 Title"));
 		assertFalse(selenium.isTextPresent("Tags Blog Entry2 Title"));
 		assertTrue(selenium.isTextPresent("Tags Blog Entry3 Title"));
@@ -68,7 +50,6 @@ public class SearchTagsTest extends BaseTestCase {
 		selenium.clickAt("//input[@value='Search']",
 			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent("Tags Blog Entry1 Title"));
 		assertTrue(selenium.isTextPresent("Tags Blog Entry2 Title"));
 		assertTrue(selenium.isTextPresent("Tags Blog Entry3 Title"));
@@ -77,7 +58,6 @@ public class SearchTagsTest extends BaseTestCase {
 		selenium.clickAt("//input[@value='Search']",
 			RuntimeVariables.replace("Search"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertFalse(selenium.isTextPresent("Tags Blog Entry1 Title"));
 		assertTrue(selenium.isTextPresent("Tags Blog Entry2 Title"));
 		assertFalse(selenium.isTextPresent("Tags Blog Entry3 Title"));

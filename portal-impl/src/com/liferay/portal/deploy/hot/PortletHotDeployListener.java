@@ -81,7 +81,6 @@ import com.liferay.portlet.asset.model.AssetRendererFactory;
 import com.liferay.portlet.social.service.SocialActivityInterpreterLocalServiceUtil;
 import com.liferay.portlet.social.service.SocialRequestInterpreterLocalServiceUtil;
 import com.liferay.util.bridges.php.PHPPortlet;
-import com.liferay.util.log4j.Log4JUtil;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -304,10 +303,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			servletContextName, servletContext, xmls,
 			hotDeployEvent.getPluginPackage());
 
-		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
-
-		initLogger(classLoader);
-
 		boolean portletAppInitialized = false;
 
 		boolean phpPortlet = false;
@@ -315,7 +310,10 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 
 		PortletBagFactory portletBagFactory = new PortletBagFactory();
 
+		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
+
 		portletBagFactory.setClassLoader(classLoader);
+
 		portletBagFactory.setServletContext(servletContext);
 		portletBagFactory.setWARFile(true);
 
@@ -332,8 +330,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 			else {
 				if (!portletAppInitialized) {
 					initPortletApp(
-						portlet, servletContextName, servletContext,
-						classLoader);
+						servletContextName, servletContext, classLoader,
+						portlet);
 
 					portletAppInitialized = true;
 				}
@@ -528,11 +526,6 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 		}
 	}
 
-	protected void initLogger(ClassLoader classLoader) {
-		Log4JUtil.configureLog4J(
-			classLoader.getResource("META-INF/portal-log4j.xml"));
-	}
-
 	protected PortletBag initPortlet(
 			Portlet portlet, PortletBagFactory portletBagFactory)
 		throws Exception {
@@ -541,8 +534,8 @@ public class PortletHotDeployListener extends BaseHotDeployListener {
 	}
 
 	protected void initPortletApp(
-			Portlet portlet, String servletContextName,
-			ServletContext servletContext, ClassLoader classLoader)
+			String servletContextName, ServletContext servletContext,
+			ClassLoader classLoader, Portlet portlet)
 		throws Exception {
 
 		PortletContextBag portletContextBag = new PortletContextBag(

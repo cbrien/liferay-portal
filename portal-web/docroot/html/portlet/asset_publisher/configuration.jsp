@@ -322,11 +322,9 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 			<c:when test='<%= selectionStyle.equals("dynamic") %>'>
 				<liferay-ui:panel-container extended="<%= true %>" id="assetPublisherDynamicSelectionStylePanelContainer" persistState="<%= true %>">
 					<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="assetPublisherSourcePanel" persistState="<%= true %>" title="source">
-						<c:if test="<%= !rootPortletId.equals(PortletKeys.RELATED_ASSETS) %>">
-							<aui:fieldset label="scope">
-								<%= selectScope %>
-							</aui:fieldset>
-						</c:if>
+						<aui:fieldset cssClass='<%= rootPortletId.equals(PortletKeys.RELATED_ASSETS) ? "aui-helper-hidden" : "" %>' label="scope">
+							<%= selectScope %>
+						</aui:fieldset>
 
 						<aui:fieldset label="asset-entry-type">
 
@@ -412,7 +410,7 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 								List<KeyValuePair> subTypesLeftList = new ArrayList<KeyValuePair>();
 
 								for (long subTypeId : assetSelectedClassTypeIds) {
-									subTypesLeftList.add(new KeyValuePair(String.valueOf(subTypeId), assetAvailableClassTypes.get(subTypeId)));
+									subTypesLeftList.add(new KeyValuePair(String.valueOf(subTypeId), HtmlUtil.escape(assetAvailableClassTypes.get(subTypeId))));
 								}
 
 								Arrays.sort(assetSelectedClassTypeIds);
@@ -432,13 +430,13 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 									<optgroup label="<liferay-ui:message key="subtype" />">
 
 										<%
-										for(Long classTypeId : assetAvailableClassTypes.keySet()) {
+										for (Long classTypeId : assetAvailableClassTypes.keySet()) {
 											if (Arrays.binarySearch(assetSelectedClassTypeIds, classTypeId) < 0) {
-												subTypesRightList.add(new KeyValuePair(String.valueOf(classTypeId), assetAvailableClassTypes.get(classTypeId)));
+												subTypesRightList.add(new KeyValuePair(String.valueOf(classTypeId), HtmlUtil.escape(assetAvailableClassTypes.get(classTypeId))));
 											}
 										%>
 
-											<aui:option label="<%= assetAvailableClassTypes.get(classTypeId) %>" selected="<%= !anyAssetSubType && (assetSelectedClassTypeIds.length == 1) && (classTypeId.equals(assetSelectedClassTypeIds[0])) %>" value="<%= classTypeId %>" />
+											<aui:option label="<%= HtmlUtil.escapeAttribute(assetAvailableClassTypes.get(classTypeId)) %>" selected="<%= !anyAssetSubType && (assetSelectedClassTypeIds.length == 1) && (classTypeId.equals(assetSelectedClassTypeIds[0])) %>" value="<%= classTypeId %>" />
 
 										<%
 										}
@@ -658,46 +656,49 @@ List<AssetRendererFactory> classTypesAssetRendererFactories = new ArrayList<Asse
 					<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="assetPublisherDisplaySettingsPanel" persistState="<%= true %>" title="display-settings">
 						<%@ include file="/html/portlet/asset_publisher/display_settings.jspf" %>
 					</liferay-ui:panel>
-					<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="assetPublisherRssPanel" persistState="<%= true %>" title="rss">
-						<aui:fieldset>
-							<aui:input label="enable-rss-subscription" name="preferences--enableRss--" type="checkbox" value="<%= enableRSS %>" />
 
-							<div id="<portlet:namespace />rssOptions">
-								<aui:input label="rss-feed-name" name="preferences--rssName--" type="text" value="<%= rssName %>" />
+					<c:if test="<%= PortalUtil.isRSSFeedsEnabled() %>">
+						<liferay-ui:panel collapsible="<%= true %>" extended="<%= true %>" id="assetPublisherRssPanel" persistState="<%= true %>" title="rss">
+							<aui:fieldset>
+								<aui:input label="enable-rss-subscription" name="preferences--enableRss--" type="checkbox" value="<%= enableRSS %>" />
 
-								<aui:select label="maximum-items-to-display" name="preferences--rssDelta--">
-									<aui:option label="1" selected="<%= rssDelta == 1 %>" />
-									<aui:option label="2" selected="<%= rssDelta == 2 %>" />
-									<aui:option label="3" selected="<%= rssDelta == 3 %>" />
-									<aui:option label="4" selected="<%= rssDelta == 4 %>" />
-									<aui:option label="5" selected="<%= rssDelta == 5 %>" />
-									<aui:option label="10" selected="<%= rssDelta == 10 %>" />
-									<aui:option label="15" selected="<%= rssDelta == 15 %>" />
-									<aui:option label="20" selected="<%= rssDelta == 20 %>" />
-									<aui:option label="25" selected="<%= rssDelta == 25 %>" />
-									<aui:option label="30" selected="<%= rssDelta == 30 %>" />
-									<aui:option label="40" selected="<%= rssDelta == 40 %>" />
-									<aui:option label="50" selected="<%= rssDelta == 50 %>" />
-									<aui:option label="60" selected="<%= rssDelta == 60 %>" />
-									<aui:option label="70" selected="<%= rssDelta == 70 %>" />
-									<aui:option label="80" selected="<%= rssDelta == 80 %>" />
-									<aui:option label="90" selected="<%= rssDelta == 90 %>" />
-									<aui:option label="100" selected="<%= rssDelta == 100 %>" />
-								</aui:select>
+								<div id="<portlet:namespace />rssOptions">
+									<aui:input label="rss-feed-name" name="preferences--rssName--" type="text" value="<%= rssName %>" />
 
-								<aui:select label="display-style" name="preferences--rssDisplayStyle--">
-									<aui:option label="<%= RSSUtil.DISPLAY_STYLE_ABSTRACT %>" selected="<%= rssDisplayStyle.equals(RSSUtil.DISPLAY_STYLE_ABSTRACT) %>" />
-									<aui:option label="<%= RSSUtil.DISPLAY_STYLE_TITLE %>" selected="<%= rssDisplayStyle.equals(RSSUtil.DISPLAY_STYLE_TITLE) %>" />
-								</aui:select>
+									<aui:select label="maximum-items-to-display" name="preferences--rssDelta--">
+										<aui:option label="1" selected="<%= rssDelta == 1 %>" />
+										<aui:option label="2" selected="<%= rssDelta == 2 %>" />
+										<aui:option label="3" selected="<%= rssDelta == 3 %>" />
+										<aui:option label="4" selected="<%= rssDelta == 4 %>" />
+										<aui:option label="5" selected="<%= rssDelta == 5 %>" />
+										<aui:option label="10" selected="<%= rssDelta == 10 %>" />
+										<aui:option label="15" selected="<%= rssDelta == 15 %>" />
+										<aui:option label="20" selected="<%= rssDelta == 20 %>" />
+										<aui:option label="25" selected="<%= rssDelta == 25 %>" />
+										<aui:option label="30" selected="<%= rssDelta == 30 %>" />
+										<aui:option label="40" selected="<%= rssDelta == 40 %>" />
+										<aui:option label="50" selected="<%= rssDelta == 50 %>" />
+										<aui:option label="60" selected="<%= rssDelta == 60 %>" />
+										<aui:option label="70" selected="<%= rssDelta == 70 %>" />
+										<aui:option label="80" selected="<%= rssDelta == 80 %>" />
+										<aui:option label="90" selected="<%= rssDelta == 90 %>" />
+										<aui:option label="100" selected="<%= rssDelta == 100 %>" />
+									</aui:select>
 
-								<aui:select label="format" name="preferences--rssFormat--">
-									<aui:option label="RSS 1.0" selected='<%= rssFormat.equals("rss10") %>' value="rss10" />
-									<aui:option label="RSS 2.0" selected='<%= rssFormat.equals("rss20") %>' value="rss20" />
-									<aui:option label="Atom 1.0" selected='<%= rssFormat.equals("atom10") %>' value="atom10" />
-								</aui:select>
-							</div>
-						</aui:fieldset>
-					</liferay-ui:panel>
+									<aui:select label="display-style" name="preferences--rssDisplayStyle--">
+										<aui:option label="<%= RSSUtil.DISPLAY_STYLE_ABSTRACT %>" selected="<%= rssDisplayStyle.equals(RSSUtil.DISPLAY_STYLE_ABSTRACT) %>" />
+										<aui:option label="<%= RSSUtil.DISPLAY_STYLE_TITLE %>" selected="<%= rssDisplayStyle.equals(RSSUtil.DISPLAY_STYLE_TITLE) %>" />
+									</aui:select>
+
+									<aui:select label="format" name="preferences--rssFormat--">
+										<aui:option label="RSS 1.0" selected='<%= rssFormat.equals("rss10") %>' value="rss10" />
+										<aui:option label="RSS 2.0" selected='<%= rssFormat.equals("rss20") %>' value="rss20" />
+										<aui:option label="Atom 1.0" selected='<%= rssFormat.equals("atom10") %>' value="atom10" />
+									</aui:select>
+								</div>
+							</aui:fieldset>
+						</liferay-ui:panel>
+					</c:if>
 				</liferay-ui:panel-container>
 
 				<aui:button-row>

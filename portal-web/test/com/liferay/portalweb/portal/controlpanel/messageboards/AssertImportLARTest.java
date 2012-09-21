@@ -22,33 +22,16 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class AssertImportLARTest extends BaseTestCase {
 	public void testAssertImportLAR() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isElementPresent("link=Control Panel")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForElementPresent("link=Control Panel");
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Message Boards",
 			RuntimeVariables.replace("Message Boards"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("T\u00e9st Cat\u00e9gory"));
 		assertTrue(selenium.isTextPresent("T\u00e9st Cat\u00e9gory Edit\u00e9d"));
 		assertEquals(RuntimeVariables.replace(
@@ -57,14 +40,12 @@ public class AssertImportLARTest extends BaseTestCase {
 		selenium.clickAt("//tr[4]/td[2]/a[1]/strong",
 			RuntimeVariables.replace("T\u00e9st Cat\u00e9gory Edit\u00e9d"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("T\u00e9st Subcat\u00e9gory"));
 		assertEquals(RuntimeVariables.replace("T\u00e9st Subcat\u00e9gory"),
 			selenium.getText("//td[2]/a/strong"));
 		selenium.clickAt("//td[2]/a/strong",
 			RuntimeVariables.replace("T\u00e9st Subcat\u00e9gory"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent(
 				"S\u00e9cond T\u00e9st Subcat\u00e9gory"));
 		assertTrue(selenium.isTextPresent("T\u00e9st M\u00e9ssag\u00e9 Edited"));
@@ -72,56 +53,19 @@ public class AssertImportLARTest extends BaseTestCase {
 		selenium.clickAt("link=RE: T\u00e9st M\u00e9ssag\u00e9",
 			RuntimeVariables.replace("RE: T\u00e9st M\u00e9ssag\u00e9"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent(
 				"This is a t\u00e9st r\u00e9ply m\u00e9ssag\u00e9!"));
 		assertTrue(selenium.isTextPresent("This is a second reply message."));
 		assertTrue(selenium.isTextPresent("This is a third reply message."));
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Message Boards")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Message Boards");
 		selenium.clickAt("link=Message Boards",
 			RuntimeVariables.replace("Message Boards"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (RuntimeVariables.replace("Sujr")
-										.equals(selenium.getText(
-								"//td[2]/a/strong"))) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForText("//td[2]/a/strong", "Sujr");
 		assertEquals(RuntimeVariables.replace("Sujr"),
 			selenium.getText("//td[2]/a/strong"));
 		selenium.clickAt("//td[2]/a/strong", RuntimeVariables.replace("Sujr"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("Moved to Sujr"));
 	}
 }

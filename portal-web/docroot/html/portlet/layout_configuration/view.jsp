@@ -80,15 +80,13 @@
 				<c:if test="<%= !layout.isTypePanel() && permissionChecker.isOmniadmin() && PortletLocalServiceUtil.hasPortlet(themeDisplay.getCompanyId(), PortletKeys.MARKETPLACE_STORE) %>">
 
 					<%
-					Group controlPanelGroup = GroupLocalServiceUtil.getGroup(company.getCompanyId(), GroupConstants.CONTROL_PANEL);
-
-					long controlPanelPlid = LayoutLocalServiceUtil.getDefaultPlid(controlPanelGroup.getGroupId(), true);
+					long controlPanelPlid = PortalUtil.getControlPanelPlid(company.getCompanyId());
 
 					PortletURLImpl marketplaceURL = new PortletURLImpl(request, PortletKeys.MARKETPLACE_STORE, controlPanelPlid, PortletRequest.RENDER_PHASE);
 					%>
 
 					<p class="lfr-install-more">
-						<aui:a href="<%= marketplaceURL.toString() %>" label="install-more-applications" />
+						<aui:a href='<%= HttpUtil.removeParameter(marketplaceURL.toString(), "controlPanelCategory") %>' label="install-more-applications" />
 					</p>
 				</c:if>
 			</aui:form>

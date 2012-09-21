@@ -47,6 +47,13 @@ portletURL.setParameter("struts_action", "/wiki/view_page_attachments");
 PortalUtil.addPortletBreadcrumbEntry(request, LanguageUtil.get(pageContext, "attachments"), portletURL.toString());
 %>
 
+<portlet:actionURL var="undoTrashURL">
+	<portlet:param name="struts_action" value="/wiki/edit_page_attachment" />
+	<portlet:param name="<%= Constants.CMD %>" value="<%= Constants.RESTORE %>" />
+</portlet:actionURL>
+
+<liferay-ui:trash-undo portletURL="<%= undoTrashURL %>" />
+
 <liferay-util:include page="/html/portlet/wiki/top_links.jsp" />
 
 <liferay-util:include page="/html/portlet/wiki/page_tabs.jsp">
@@ -70,10 +77,10 @@ headerNames.add(StringPool.BLANK);
 String emptyResultsMessage = null;
 
 if (viewTrashAttachments) {
-	emptyResultsMessage = "this-page-does-not-have-any-file-attachments-in-the-recycle-bin";
+	emptyResultsMessage = "this-page-does-not-have-file-attachments-in-the-recycle-bin";
 }
 else {
-	emptyResultsMessage = "this-page-does-not-have-any-file-attachments";
+	emptyResultsMessage = "this-page-does-not-have-file-attachments";
 }
 
 SearchContainer searchContainer = new SearchContainer(renderRequest, null, null, SearchContainer.DEFAULT_CUR_PARAM, SearchContainer.DEFAULT_DELTA, currentURLObj, headerNames, emptyResultsMessage);
@@ -110,12 +117,18 @@ for (int i = 0; i < results.size(); i++) {
 
 	// File name
 
+	if (viewTrashAttachments) {
+		shortFileName = TrashUtil.stripTrashNamespace(shortFileName, TrashUtil.TRASH_TIME_SEPARATOR);
+	}
+
+	String extension = FileUtil.getExtension(shortFileName);
+
 	StringBundler sb = new StringBundler(6);
 
 	sb.append("<img align=\"left\" border=\"0\" src=\"");
 	sb.append(themeDisplay.getPathThemeImages());
 	sb.append("/file_system/small/");
-	sb.append(DLUtil.getFileIcon(shortFileName));
+	sb.append(DLUtil.getFileIcon(extension));
 	sb.append(".png\">&nbsp;");
 	sb.append(shortFileName);
 
@@ -170,7 +183,7 @@ for (int i = 0; i < results.size(); i++) {
 					cssClass="trash-attachments"
 					image="delete"
 					label="<%= true %>"
-					message='<%= LanguageUtil.format(pageContext, "x-attachments-in-the-recycle-bin", deletedAttachments.length) %>'
+					message='<%= LanguageUtil.format(pageContext, "x-recent-deleted-attachments", deletedAttachments.length) %>'
 					url="<%= viewTrashAttachmentsURL %>"
 				/>
 			</c:if>

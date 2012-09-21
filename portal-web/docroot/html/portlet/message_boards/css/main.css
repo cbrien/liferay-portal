@@ -51,8 +51,43 @@
 		padding: 5px;
 	}
 
+	.trash-attachments {
+		float: right;
+	}
+
 	#messageBoardsPanelContainer {
 		border-width: 0;
+	}
+
+	.message-attachments {
+		h3 {
+			color: #333;
+			font-size: 1em;
+		}
+
+		legend {
+			.aui-legend {
+				width: 100%;
+			}
+		}
+
+		ul {
+			list-style: none;
+		}
+
+		.message-attachment {
+			padding: 0.5em;
+		}
+
+		.deleted-input {
+			list-style: none;
+			margin-left: -2em;
+			padding: 0;
+		}
+
+		.undo {
+			font-weight: bold;
+		}
 	}
 
 	.message-container {

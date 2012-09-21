@@ -20,10 +20,6 @@
 Folder folder = (Folder)request.getAttribute("view.jsp-folder");
 %>
 
-<c:if test="<%= !user.isDefaultUser() %>">
-	<aui:input cssClass="select-documents aui-state-default" inline="<%= true %>" label="" name='<%= RowChecker.ALL_ROW_IDS %>' type="checkbox" />
-</c:if>
-
 <liferay-ui:icon-menu align="left" cssClass="actions-button aui-helper-hidden" direction="down" icon="" id="actionsButtonContainer" message="actions" showExpanded="<%= false %>" showWhenSingleIcon="<%= true %>">
 
 	<%
@@ -81,12 +77,12 @@ Folder folder = (Folder)request.getAttribute("view.jsp-folder");
 		<c:when test="<%= (folder == null) || (folder.getModel() instanceof DLFolder) %>">
 
 			<%
-			String taglibURL = "Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + (TrashUtil.isTrashEnabled(themeDisplay.getScopeGroupId()) ? Constants.MOVE_TO_TRASH : Constants.DELETE) + "'});";
+			String taglibURL = "Liferay.fire('" + renderResponse.getNamespace() + "editEntry', {action: '" + (TrashUtil.isTrashEnabled(scopeGroupId) ? Constants.MOVE_TO_TRASH : Constants.DELETE) + "'});";
 			%>
 
 			<liferay-ui:icon-delete
 				confirmation="are-you-sure-you-want-to-delete-the-selected-entries"
-				trash="<%= TrashUtil.isTrashEnabled(themeDisplay.getScopeGroupId()) %>"
+				trash="<%= TrashUtil.isTrashEnabled(scopeGroupId) %>"
 				url="<%= taglibURL %>"
 			/>
 		</c:when>

@@ -107,6 +107,12 @@ public class PortletPreferencesLocalServiceImpl
 			ownerId, ownerType, plid, portletId);
 	}
 
+	public void deletePortletPreferencesByPlid(long plid)
+		throws SystemException {
+
+		portletPreferencesPersistence.removeByPlid(plid);
+	}
+
 	@Skip
 	public javax.portlet.PortletPreferences getDefaultPreferences(
 			long companyId, String portletId)
@@ -169,6 +175,14 @@ public class PortletPreferencesLocalServiceImpl
 		throws SystemException {
 
 		return portletPreferencesPersistence.findByPlid(plid);
+	}
+
+	public long getPortletPreferencesCount(
+			int ownerType, long plid, String portletId)
+		throws SystemException {
+
+		return portletPreferencesPersistence.countByO_P_P(
+			ownerType, plid, portletId);
 	}
 
 	public javax.portlet.PortletPreferences getPreferences(

@@ -15,8 +15,13 @@
 package com.liferay.portal.kernel.template;
 
 import com.liferay.portal.kernel.io.unsync.UnsyncStringReader;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portlet.journal.model.JournalTemplate;
+import com.liferay.portlet.journal.service.JournalTemplateLocalServiceUtil;
 
+import java.io.IOException;
+import java.io.ObjectInput;
+import java.io.ObjectOutput;
 import java.io.Reader;
 
 import java.util.Date;
@@ -26,10 +31,17 @@ import java.util.Date;
  */
 public class JournalTemplateResource implements TemplateResource {
 
+	/**
+	 * The empty constructor is required by {@link java.io.Externalizable}. Do
+	 * not use this for any other purpose.
+	 */
+	public JournalTemplateResource() {
+	}
+
 	public JournalTemplateResource(
 		String templateId, JournalTemplate journalTemplate) {
 
-		if (templateId == null) {
+		if (Validator.isNull(templateId)) {
 			throw new IllegalArgumentException("Template ID is null");
 		}
 
@@ -41,6 +53,28 @@ public class JournalTemplateResource implements TemplateResource {
 		_journalTemplate = journalTemplate;
 	}
 
+	@Override
+	public boolean equals(Object obj) {
+		if (this == obj) {
+			return true;
+		}
+
+		if (!(obj instanceof JournalTemplateResource)) {
+			return false;
+		}
+
+		JournalTemplateResource journalTemplateResource =
+			(JournalTemplateResource)obj;
+
+		if (_templateId.equals(journalTemplateResource._templateId) &&
+			_journalTemplate.equals(journalTemplateResource._journalTemplate)) {
+
+			return true;
+		}
+
+		return false;
+	}
+
 	public long getLastModified() {
 		Date modifiedDate = _journalTemplate.getModifiedDate();
 
@@ -48,10 +82,6 @@ public class JournalTemplateResource implements TemplateResource {
 	}
 
 	public Reader getReader() {
-		if (_journalTemplate == null) {
-			return null;
-		}
-
 		String xsl = _journalTemplate.getXsl();
 
 		return new UnsyncStringReader(xsl);
@@ -59,6 +89,34 @@ public class JournalTemplateResource implements TemplateResource {
 
 	public String getTemplateId() {
 		return _templateId;
+	}
+
+	@Override
+	public int hashCode() {
+		return _templateId.hashCode() * 11 + _journalTemplate.hashCode();
+	}
+
+	public void readExternal(ObjectInput objectInput) throws IOException {
+		long journalTemplateId = objectInput.readLong();
+
+		try {
+			_journalTemplate =
+				JournalTemplateLocalServiceUtil.getJournalTemplate(
+					journalTemplateId);
+		}
+		catch (Exception e) {
+			throw new IOException(
+				"Unable to retrieve journal template with ID " +
+					journalTemplateId,
+				e);
+		}
+
+		_templateId = objectInput.readUTF();
+	}
+
+	public void writeExternal(ObjectOutput objectOutput) throws IOException {
+		objectOutput.writeLong(_journalTemplate.getId());
+		objectOutput.writeUTF(_templateId);
 	}
 
 	private JournalTemplate _journalTemplate;

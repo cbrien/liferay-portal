@@ -259,8 +259,8 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			params.put("site", Boolean.TRUE);
 
 			return groupLocalService.search(
-				permissionChecker.getCompanyId(), null, null, null, params, 0,
-				max);
+				permissionChecker.getCompanyId(), null, null, null, params,
+				true, 0, max);
 		}
 
 		List<Group> groups = new UniqueList<Group>();
@@ -568,6 +568,8 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 	 * @param  groupId the primary key of the group
 	 * @return <code>true</code> if the user is associated with the group;
 	 *         <code>false</code> otherwise
+	 * @throws PortalException if the current user did not have permission to
+	 *         view the user or group members
 	 * @throws SystemException if a system exception occurred
 	 */
 	public boolean hasUserGroup(long userId, long groupId)
@@ -623,11 +625,15 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			int start, int end)
 		throws PortalException, SystemException {
 
+		if (params == null) {
+			params = new String[0];
+		}
+
 		LinkedHashMap<String, Object> paramsObj = MapUtil.toLinkedHashMap(
 			params);
 
 		List<Group> groups = groupLocalService.search(
-			companyId, name, description, paramsObj, start, end);
+			companyId, name, description, paramsObj, true, start, end);
 
 		return filterGroups(groups);
 	}
@@ -654,11 +660,15 @@ public class GroupServiceImpl extends GroupServiceBaseImpl {
 			long companyId, String name, String description, String[] params)
 		throws SystemException {
 
+		if (params == null) {
+			params = new String[0];
+		}
+
 		LinkedHashMap<String, Object> paramsObj = MapUtil.toLinkedHashMap(
 			params);
 
 		return groupLocalService.searchCount(
-			companyId, name, description, paramsObj);
+			companyId, name, description, paramsObj, true);
 	}
 
 	/**

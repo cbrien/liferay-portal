@@ -216,7 +216,7 @@ create table BlogsEntry (
 	modifiedDate DATE null,
 	title VARCHAR(150) null,
 	urlTitle VARCHAR(150) null,
-	description VARCHAR(75) null,
+	description STRING null,
 	content TEXT null,
 	displayDate DATE null,
 	allowPingbacks BOOLEAN,
@@ -2187,7 +2187,11 @@ create table WikiNode (
 	modifiedDate DATE null,
 	name VARCHAR(75) null,
 	description STRING null,
-	lastPostDate DATE null
+	lastPostDate DATE null,
+	status INTEGER,
+	statusByUserId LONG,
+	statusByUserName VARCHAR(75) null,
+	statusDate DATE null
 );
 
 create table WikiPage (

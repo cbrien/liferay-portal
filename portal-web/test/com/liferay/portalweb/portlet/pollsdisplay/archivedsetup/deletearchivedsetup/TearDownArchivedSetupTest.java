@@ -27,82 +27,33 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("link=Polls Display Test Page")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("link=Polls Display Test Page");
 				selenium.clickAt("link=Polls Display Test Page",
 					RuntimeVariables.replace("Polls Display Test Page"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				Thread.sleep(5000);
 				assertEquals(RuntimeVariables.replace("Options"),
 					selenium.getText("//strong/a"));
 				selenium.clickAt("//strong/a",
 					RuntimeVariables.replace("Options"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a");
 				assertEquals(RuntimeVariables.replace("Configuration"),
 					selenium.getText(
 						"//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a"));
 				selenium.clickAt("//div[@class='lfr-component lfr-menu-list']/ul/li[2]/a",
 					RuntimeVariables.replace("Configuration"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//div[@class='archived-setups']/span/a/span")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//div[@class='archived-setups']/span/a/span");
 				assertEquals(RuntimeVariables.replace("Archive/Restore Setup"),
 					selenium.getText(
 						"//div[@class='archived-setups']/span/a/span"));
 				selenium.clickAt("//div[@class='archived-setups']/span/a/span",
 					RuntimeVariables.replace("Archive/Restore Setup"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 				boolean pdArchivedSetup1Present = selenium.isElementPresent(
 						"//tr[3]/td[4]/span/ul/li/strong/a");
@@ -119,31 +70,14 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 						"//span[@title='Actions']/ul/li/strong/a/span"));
 				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a/span",
 					RuntimeVariables.replace("Actions"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//a[@id='_86_ocerSearchContainer_1_menu_delete']");
 				assertEquals(RuntimeVariables.replace("Delete"),
 					selenium.getText(
 						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.clickAt("//a[@id='_86_ocerSearchContainer_1_menu_delete']",
 					RuntimeVariables.replace("Delete"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
 
@@ -164,31 +98,14 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 						"//span[@title='Actions']/ul/li/strong/a/span"));
 				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a/span",
 					RuntimeVariables.replace("Actions"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//a[@id='_86_ocerSearchContainer_1_menu_delete']");
 				assertEquals(RuntimeVariables.replace("Delete"),
 					selenium.getText(
 						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.clickAt("//a[@id='_86_ocerSearchContainer_1_menu_delete']",
 					RuntimeVariables.replace("Delete"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
 
@@ -209,31 +126,14 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 						"//span[@title='Actions']/ul/li/strong/a/span"));
 				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a/span",
 					RuntimeVariables.replace("Actions"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//a[@id='_86_ocerSearchContainer_1_menu_delete']");
 				assertEquals(RuntimeVariables.replace("Delete"),
 					selenium.getText(
 						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.clickAt("//a[@id='_86_ocerSearchContainer_1_menu_delete']",
 					RuntimeVariables.replace("Delete"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
 
@@ -254,31 +154,14 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 						"//span[@title='Actions']/ul/li/strong/a/span"));
 				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a/span",
 					RuntimeVariables.replace("Actions"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//a[@id='_86_ocerSearchContainer_1_menu_delete']");
 				assertEquals(RuntimeVariables.replace("Delete"),
 					selenium.getText(
 						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.clickAt("//a[@id='_86_ocerSearchContainer_1_menu_delete']",
 					RuntimeVariables.replace("Delete"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
 
@@ -299,31 +182,14 @@ public class TearDownArchivedSetupTest extends BaseTestCase {
 						"//span[@title='Actions']/ul/li/strong/a/span"));
 				selenium.clickAt("//span[@title='Actions']/ul/li/strong/a/span",
 					RuntimeVariables.replace("Actions"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//a[@id='_86_ocerSearchContainer_1_menu_delete']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//a[@id='_86_ocerSearchContainer_1_menu_delete']");
 				assertEquals(RuntimeVariables.replace("Delete"),
 					selenium.getText(
 						"//a[@id='_86_ocerSearchContainer_1_menu_delete']"));
 				selenium.clickAt("//a[@id='_86_ocerSearchContainer_1_menu_delete']",
 					RuntimeVariables.replace("Delete"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertTrue(selenium.getConfirmation()
 								   .matches("^Are you sure you want to delete this[\\s\\S]$"));
 

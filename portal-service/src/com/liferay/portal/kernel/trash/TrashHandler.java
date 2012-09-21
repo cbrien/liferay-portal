@@ -16,7 +16,12 @@ package com.liferay.portal.kernel.trash;
 
 import com.liferay.portal.kernel.exception.PortalException;
 import com.liferay.portal.kernel.exception.SystemException;
+import com.liferay.portal.model.Group;
 import com.liferay.portlet.trash.model.TrashEntry;
+
+import java.util.Date;
+
+import javax.portlet.PortletRequest;
 
 /**
  * Represents the interface to manage the basic operations of the Recycle Bin.
@@ -56,6 +61,17 @@ public interface TrashHandler {
 		throws PortalException, SystemException;
 
 	/**
+	 * Deletes all trash attachments from a group that were deleted after a
+	 * given date.
+	 *
+	 * @param  groupId the primary key of the group
+	 * @param  date the date from which attachments will be deleted
+	 * @throws SystemException if a system exception occurred
+	 */
+	public void deleteTrashAttachments(Group group, Date date)
+		throws PortalException, SystemException;
+
+	/**
 	 * Deletes all trash entries with the primary keys.
 	 *
 	 * @param  classPKs the primary keys of the entries to delete
@@ -70,6 +86,8 @@ public interface TrashHandler {
 	 * Deletes all trash entries with the primary keys.
 	 *
 	 * @param  classPKs the primary keys of the entries to delete
+	 * @param  checkPermission whether to check permission before deleting each
+	 *         trash entry
 	 * @throws PortalException if an entry with the primary key could not be
 	 *         found
 	 * @throws SystemException if a system exception occurred
@@ -97,6 +115,14 @@ public interface TrashHandler {
 	 * @return the class name of the entry
 	 */
 	public String getClassName();
+
+	public String getDeleteMessage();
+
+	public String getRestoreLink(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException;
+
+	public String getRestoreMessage(PortletRequest portletRequest, long classPK)
+		throws PortalException, SystemException;
 
 	/**
 	 * Returns the trash renderer associated to the trash entry.

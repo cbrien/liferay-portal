@@ -22,51 +22,31 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class BrowseServerPluginsInstallationTest extends BaseTestCase {
 	public void testBrowseServerPluginsInstallation() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Go to"),
 			selenium.getText("//li[@id='_145_mySites']/a/span"));
 		selenium.mouseOver("//li[@id='_145_mySites']/a/span");
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Control Panel")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Control Panel");
 		selenium.clickAt("link=Control Panel",
 			RuntimeVariables.replace("Control Panel"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.clickAt("link=Plugins Installation",
 			RuntimeVariables.replace("Plugins Installation"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isVisible("//input[@value='Install More Portlets']"));
 		selenium.select("//select[@name='_136_page']",
 			RuntimeVariables.replace("4"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isTextPresent("Wiki"));
 		selenium.clickAt("link=Theme Plugins",
 			RuntimeVariables.replace("Theme Plugins"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isVisible("//input[@value='Install More Themes']"));
 		selenium.clickAt("link=Layout Template Plugins",
 			RuntimeVariables.replace("Layout Template Plugins"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isVisible(
 				"//input[@value='Install More Layout Templates']"));
 	}

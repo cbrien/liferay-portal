@@ -34,6 +34,10 @@ JSONArray scriptJSONArray = null;
 if (Validator.isNotNull(script)) {
 	scriptJSONArray = DDMXSDUtil.getJSONArray(script);
 }
+
+if (scriptJSONArray != null) {
+	scriptJSONArray = _addStructureFieldAttributes(structure, scriptJSONArray);
+}
 %>
 
 <portlet:actionURL var="editStructureURL">
@@ -48,6 +52,15 @@ if (Validator.isNotNull(script)) {
 	<aui:input name="xsd" type="hidden" />
 	<aui:input name="saveCallback" type="hidden" value="<%= saveCallback %>" />
 	<aui:input name="saveAndContinue" type="hidden" value="<%= false %>" />
+
+	<liferay-ui:error exception="<%= LocaleException.class %>">
+
+		<%
+		LocaleException le = (LocaleException)errorException;
+		%>
+
+		<liferay-ui:message arguments="<%= new String[] {StringUtil.merge(le.getSourceAvailableLocales(), StringPool.COMMA_AND_SPACE), StringUtil.merge(le.getTargetAvailableLocales(), StringPool.COMMA_AND_SPACE)} %>" key="the-default-language-x-does-not-match-the-portal's-available-languages-x" />
+	</liferay-ui:error>
 
 	<liferay-ui:error exception="<%= StructureDuplicateElementException.class %>" message="please-enter-unique-structure-field-names-(including-field-names-inherited-from-the-parent-structure)" />
 	<liferay-ui:error exception="<%= StructureNameException.class %>" message="please-enter-a-valid-name" />
@@ -123,6 +136,23 @@ if (Validator.isNotNull(script)) {
 				</aui:layout>
 
 				<aui:input name="description" />
+
+				<c:if test="<%= structure != null %>">
+					<aui:field-wrapper label="url">
+						<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathMain() + "/dynamic_data_mapping/get_structure?structureId=" + classPK %>' />
+					</aui:field-wrapper>
+
+					<c:if test="<%= portletDisplay.isWebDAVEnabled() %>">
+						<aui:field-wrapper label="webdav-url">
+
+							<%
+							Group scopeGroup = GroupLocalServiceUtil.getGroup(scopeGroupId);
+							%>
+
+							<liferay-ui:input-resource url='<%= themeDisplay.getPortalURL() + themeDisplay.getPathContext() + "/webdav" + scopeGroup.getFriendlyURL() + "/dynamic_data_mapping/ddmStructures/" + classPK %>' />
+						</aui:field-wrapper>
+					</c:if>
+				</c:if>
 			</liferay-ui:panel>
 		</liferay-ui:panel-container>
 	</aui:fieldset>
@@ -152,3 +182,35 @@ if (Validator.isNotNull(script)) {
 		window.parent['<%= HtmlUtil.escapeJS(saveCallback) %>']('<%= classPK %>', '<%= HtmlUtil.escape(structure.getName(locale)) %>');
 	</c:if>
 </aui:script>
+
+<%!
+public JSONArray _addStructureFieldAttributes(DDMStructure structure, JSONArray scriptJSONArray) {
+	for (int i = 0; i < scriptJSONArray.length(); i++) {
+		JSONObject jsonObject = scriptJSONArray.getJSONObject(i);
+
+		String fieldName = jsonObject.getString("name");
+
+		try {
+			jsonObject.put("readOnlyAttributes", _getFieldReadOnlyAttributes(structure, fieldName));
+		}
+		catch (StructureFieldException sfe) {
+		}
+	}
+
+	return scriptJSONArray;
+}
+
+public JSONArray _getFieldReadOnlyAttributes(DDMStructure structure, String fieldName) throws StructureFieldException {
+	JSONArray readOnlyAttributesJSONArray = JSONFactoryUtil.createJSONArray();
+
+	try {
+		if (DDMStorageLinkLocalServiceUtil.getStructureStorageLinksCount(structure.getStructureId()) > 0) {
+			readOnlyAttributesJSONArray.put("name");
+		}
+	}
+	catch (Exception e) {
+	}
+
+	return readOnlyAttributesJSONArray;
+}
+%>

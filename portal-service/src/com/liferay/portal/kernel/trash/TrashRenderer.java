@@ -33,6 +33,8 @@ public interface TrashRenderer {
 
 	public String getPortletId();
 
+	public String getRestorePath(RenderRequest renderRequest);
+
 	public String getSummary(Locale locale);
 
 	public String getTitle(Locale locale);

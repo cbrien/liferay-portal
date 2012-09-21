@@ -27,29 +27,13 @@ public class EditWikiFrontPageMinorChangeTest extends BaseTestCase {
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("link=Wiki Display Test Page")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("link=Wiki Display Test Page");
 				selenium.clickAt("link=Wiki Display Test Page",
 					RuntimeVariables.replace("Wiki Display Test Page"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace("Wiki FrontPage Content"),
 					selenium.getText("//div[@class='wiki-body']/p"));
 				assertEquals(RuntimeVariables.replace("Edit"),
@@ -57,112 +41,29 @@ public class EditWikiFrontPageMinorChangeTest extends BaseTestCase {
 				selenium.clickAt("//span[contains(.,'Edit')]/a/span",
 					RuntimeVariables.replace("Edit"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent(
-									"//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent(
+					"//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]");
 				assertEquals(RuntimeVariables.replace("Source"),
 					selenium.getText("//span[.='Source']"));
 				selenium.clickAt("//span[.='Source']",
 					RuntimeVariables.replace("Source"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//a[@class='cke_button_source cke_on']")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible(
-									"//td[contains(@id,'cke_contents__54')]/textarea")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible(
+					"//a[@class='cke_button_source cke_on']");
+				selenium.waitForVisible(
+					"//td[contains(@id,'cke_contents__54')]/textarea");
 				selenium.type("//td[contains(@id,'cke_contents__54')]/textarea",
 					RuntimeVariables.replace("Wiki FrontPage Content Edit"));
 				assertEquals(RuntimeVariables.replace("Source"),
 					selenium.getText("//span[.='Source']"));
 				selenium.clickAt("//span[.='Source']",
 					RuntimeVariables.replace("Source"));
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isElementPresent(
-									"//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForElementPresent(
+					"//textarea[contains(@id,'_editor') and contains(@style,'display: none;')]");
 				assertTrue(selenium.isVisible(
 						"//td[contains(@id,'cke_contents__54')]/iframe"));
 				selenium.selectFrame(
 					"//td[contains(@id,'cke_contents__54')]/iframe");
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (RuntimeVariables.replace(
-									"Wiki FrontPage Content Edit")
-												.equals(selenium.getText(
-										"//body"))) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForText("//body", "Wiki FrontPage Content Edit");
 				selenium.selectFrame("relative=top");
 
 				boolean minorEditChecked = selenium.isChecked(
@@ -185,7 +86,6 @@ public class EditWikiFrontPageMinorChangeTest extends BaseTestCase {
 				selenium.clickAt("//input[@value='Publish']",
 					RuntimeVariables.replace("Publish"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace(
 						"Your request completed successfully."),
 					selenium.getText("//div[@class='portlet-msg-success']"));
@@ -196,38 +96,18 @@ public class EditWikiFrontPageMinorChangeTest extends BaseTestCase {
 						"Wiki FrontPage Content"),
 					selenium.getText("//div[@class='wiki-body']/p"));
 				selenium.open("/web/guest/home/");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("link=Wiki Display Test Page")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("link=Wiki Display Test Page");
 				selenium.clickAt("link=Wiki Display Test Page",
 					RuntimeVariables.replace("Wiki Display Test Page"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace("Details"),
 					selenium.getText("//div[3]/span[2]/a/span"));
 				selenium.clickAt("//div[3]/span[2]/a/span",
 					RuntimeVariables.replace("Details"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				selenium.clickAt("link=History",
 					RuntimeVariables.replace("History"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 				assertEquals(RuntimeVariables.replace("1.2 (Minor Edit)"),
 					selenium.getText("//td[4]/a"));
 				assertEquals(RuntimeVariables.replace("1.1"),

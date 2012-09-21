@@ -26,7 +26,6 @@ import com.liferay.portal.kernel.deploy.hot.HotDeployException;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.plugin.PluginPackage;
-import com.liferay.portal.kernel.portlet.PortletClassLoaderUtil;
 import com.liferay.portal.kernel.servlet.ServletContextPool;
 import com.liferay.portal.kernel.util.AggregateClassLoader;
 import com.liferay.portal.kernel.util.GetterUtil;
@@ -35,6 +34,10 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.plugin.PluginPackageUtil;
 import com.liferay.portal.security.pacl.PACLClassLoaderUtil;
 import com.liferay.portal.service.ServiceComponentLocalServiceUtil;
+import com.liferay.util.log4j.Log4JUtil;
+import com.liferay.util.portlet.PortletProps;
+
+import java.lang.reflect.Method;
 
 import java.net.URL;
 
@@ -116,14 +119,9 @@ public class PluginPackageHotDeployListener extends BaseHotDeployListener {
 
 		ClassLoader classLoader = hotDeployEvent.getContextClassLoader();
 
-		PortletClassLoaderUtil.setClassLoader(classLoader);
-
-		try {
-			initServiceComponent(servletContext, classLoader);
-		}
-		finally {
-			PortletClassLoaderUtil.setClassLoader(null);
-		}
+		initLogger(classLoader);
+		initPortletProps(classLoader);
+		initServiceComponent(servletContext, classLoader);
 
 		registerClpMessageListeners(servletContext, classLoader);
 
@@ -170,6 +168,23 @@ public class PluginPackageHotDeployListener extends BaseHotDeployListener {
 				"Plugin package " + pluginPackage.getModuleId() +
 					" unregistered successfully");
 		}
+	}
+
+	protected void initLogger(ClassLoader classLoader) {
+		Log4JUtil.configureLog4J(
+			classLoader.getResource("META-INF/portal-log4j.xml"));
+	}
+
+	protected void initPortletProps(ClassLoader classLoader) throws Exception {
+		if (classLoader.getResourceAsStream("portlet.properties") == null) {
+			return;
+		}
+
+		Class<?> clazz = classLoader.loadClass(PortletProps.class.getName());
+
+		Method method = clazz.getMethod("get", String.class);
+
+		method.invoke(null, "init");
 	}
 
 	protected void initServiceComponent(
@@ -292,8 +307,8 @@ public class PluginPackageHotDeployListener extends BaseHotDeployListener {
 		try {
 			PACLClassLoaderUtil.setContextClassLoader(aggregateClassLoader);
 
-			PortalCacheManager portalCacheManager =
-				(PortalCacheManager)PortalBeanLocatorUtil.locate(
+			PortalCacheManager<?, ?> portalCacheManager =
+				(PortalCacheManager<?, ?>)PortalBeanLocatorUtil.locate(
 					portalCacheManagerBeanId);
 
 			if (_log.isInfoEnabled()) {

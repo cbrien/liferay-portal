@@ -22,34 +22,17 @@ import com.liferay.portalweb.portal.util.RuntimeVariables;
  */
 public class LastButtonAPTest extends BaseTestCase {
 	public void testLastButtonAP() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Asset Publisher Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Asset Publisher Test Page");
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("Last"),
 			selenium.getText("//a[@class='last']"));
 		selenium.clickAt("//a[@class='last']", RuntimeVariables.replace("Last"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("First"),
 			selenium.getText("//a[@class='first']"));
 		assertEquals(RuntimeVariables.replace("Previous"),
@@ -58,37 +41,17 @@ public class LastButtonAPTest extends BaseTestCase {
 		assertTrue(selenium.isElementNotPresent("//a[@class='last']"));
 		assertEquals("3", selenium.getSelectedLabel("//select"));
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
-
-		for (int second = 0;; second++) {
-			if (second >= 90) {
-				fail("timeout");
-			}
-
-			try {
-				if (selenium.isVisible("link=Asset Publisher Test Page")) {
-					break;
-				}
-			}
-			catch (Exception e) {
-			}
-
-			Thread.sleep(1000);
-		}
-
+		selenium.waitForVisible("link=Asset Publisher Test Page");
 		selenium.clickAt("link=Asset Publisher Test Page",
 			RuntimeVariables.replace("Asset Publisher Test Page"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		selenium.select("//select", RuntimeVariables.replace("2"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals("2", selenium.getSelectedLabel("//select"));
 		assertEquals(RuntimeVariables.replace("Last"),
 			selenium.getText("//a[@class='last']"));
 		selenium.clickAt("//a[@class='last']", RuntimeVariables.replace("Last"));
 		selenium.waitForPageToLoad("30000");
-		loadRequiredJavaScriptModules();
 		assertEquals(RuntimeVariables.replace("First"),
 			selenium.getText("//a[@class='first']"));
 		assertEquals(RuntimeVariables.replace("Previous"),

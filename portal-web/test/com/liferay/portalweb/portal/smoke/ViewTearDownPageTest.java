@@ -21,8 +21,9 @@ import com.liferay.portalweb.portal.BaseTestCase;
  */
 public class ViewTearDownPageTest extends BaseTestCase {
 	public void testViewTearDownPage() throws Exception {
+		selenium.selectWindow("null");
+		selenium.selectFrame("relative=top");
 		selenium.open("/web/guest/home/");
-		loadRequiredJavaScriptModules();
 		assertTrue(selenium.isElementNotPresent("link=Test Page1"));
 		assertTrue(selenium.isElementNotPresent("link=Test Page2"));
 		assertTrue(selenium.isElementNotPresent("link=Test Page3"));

@@ -27,25 +27,10 @@ public class SRq_SignInTest extends BaseTestCase {
 		while (label >= 1) {
 			switch (label) {
 			case 1:
+				selenium.selectWindow("null");
+				selenium.selectFrame("relative=top");
 				selenium.open("/web/guest/home");
-				loadRequiredJavaScriptModules();
-
-				for (int second = 0;; second++) {
-					if (second >= 90) {
-						fail("timeout");
-					}
-
-					try {
-						if (selenium.isVisible("_58_login")) {
-							break;
-						}
-					}
-					catch (Exception e) {
-					}
-
-					Thread.sleep(1000);
-				}
-
+				selenium.waitForVisible("_58_login");
 				selenium.type("_58_login",
 					RuntimeVariables.replace("socialrequestea1@liferay.com"));
 				selenium.type("_58_password", RuntimeVariables.replace("test"));
@@ -54,7 +39,6 @@ public class SRq_SignInTest extends BaseTestCase {
 				selenium.clickAt("//input[@value='Sign In']",
 					RuntimeVariables.replace("Sign In"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 				boolean iAgreeVisible = selenium.isElementPresent("//input[3]");
 
@@ -67,7 +51,6 @@ public class SRq_SignInTest extends BaseTestCase {
 				selenium.clickAt("//input[@value='I Agree']",
 					RuntimeVariables.replace("I Agree"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 			case 2:
 
@@ -85,7 +68,6 @@ public class SRq_SignInTest extends BaseTestCase {
 				selenium.clickAt("//input[@value='Save']",
 					RuntimeVariables.replace("Save"));
 				selenium.waitForPageToLoad("30000");
-				loadRequiredJavaScriptModules();
 
 			case 3:
 			case 100:
